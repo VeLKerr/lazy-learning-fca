@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import task.crossvalidation.DataSplitter;
+import task.evaluating.RangedMetrics;
 import task.evaluating.UnrangedMetrics;
 import task.learning.Acceptability;
 import task.learning.assoc_rules_classif.AssociationRulesOnExtremums;
@@ -94,8 +95,10 @@ public class Task {
     public static void main(String[] args) {
         List<Element> elements = new ArrayList<>();
         List<UnrangedMetrics> unrangedMetricses = new ArrayList<>();
+        List<RangedMetrics> rangedMetricses = new ArrayList<>();
         for(int i=0; i<Consts.CROSSVAL_CNT; i++){
             UnrangedMetrics unrangedMetrics = new UnrangedMetrics();
+            RangedMetrics rangedMetrics = new RangedMetrics();
             int[] testIndexes = DataSplitter.getInstance().generateIndexes();
             int elementCnt = 0;
             try(RandomAccessFile rsf = new RandomAccessFile(Consts.INPUT, "r")){
@@ -128,7 +131,10 @@ public class Task {
                             }
                         }
                         //классификация
-                        unrangedMetrics.takeIntoAccount(classification(classificators), newEl.getAcceptability());
+                        Acceptability classificationRes = classification(classificators);
+                        //оценка алгоритма
+                        unrangedMetrics.takeIntoAccount(classificationRes, newEl.getAcceptability());
+                        rangedMetrics.takeIntoAccount(classificationRes, newEl.getAcceptability());
                         //дообучение
                         elements.add(newEl);
                     }
@@ -136,6 +142,7 @@ public class Task {
                 }
                 elements.clear();
                 unrangedMetricses.add(unrangedMetrics);
+                rangedMetricses.add(rangedMetrics);
             }
             catch(IOException ex){
                 System.err.println("Unable to read the file!" + elementCnt);
@@ -144,5 +151,9 @@ public class Task {
         System.out.println(UnrangedMetrics.listToString(unrangedMetricses));
         System.out.println("******* AVERAGE *************");
         System.out.println(UnrangedMetrics.avg(unrangedMetricses).toString(false));
+        System.out.println("");
+//        System.out.println(RangedMetrics.listToString(rangedMetricses));
+//        System.out.println("******* AVERAGE *************");
+//        System.out.println(RangedMetrics.avg(rangedMetricses).toString(false));
     }
 }

@@ -41,9 +41,11 @@ public abstract class Utils {
         return true;
     }
     
-//    public static <K extends Enum<K>> void initEnumMap(EnumMap<K, Integer> map){
-//        for(K k: K.values()){
-//            
-//        }
-//    }
+    public static double sum (double[] array){
+        double sum = 0.0;
+        for(double el: array){
+            sum += el;
+        }
+        return sum;
+    }
 }
