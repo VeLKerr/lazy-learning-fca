@@ -4,6 +4,7 @@ package task.evaluating;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import task.learning.Acceptability;
 import task.utils.Utils;
@@ -12,8 +13,8 @@ import task.utils.Utils;
  *
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public class UnrangedMetrics {
-    public enum Types{
+public class UnrangedMetrics extends Metrics<UnrangedMetrics.Types>{
+    protected enum Types{
         MAE(true),
         RMSE(true),
         NMAE(false),
@@ -59,6 +60,7 @@ public class UnrangedMetrics {
         this.cnt = cnt;
     }
     
+    @Override
     public void takeIntoAccount(Acceptability actuals, Acceptability expected){
         int diff = actuals.ordinal() - expected.ordinal();
         sums[0] += Math.abs(diff);
@@ -66,7 +68,8 @@ public class UnrangedMetrics {
         cnt++;
     }
     
-    private EnumMap<Types, Double> countMetrics(){
+    @Override
+    protected EnumMap<Types, Double> countMetrics(){
         EnumMap<Types, Double> map = new EnumMap(Types.class);
         double m1 = sums[0] / cnt;
         map.put(Types.MAE, m1);
@@ -75,6 +78,25 @@ public class UnrangedMetrics {
         map.put(Types.RMSE, m2);
         map.put(Types.NRMSE, m2 / Acceptability.values().length);
         return map;
+    }
+    
+    @Override
+    public String headerToString(){
+        return Types.getNamesToString();  
+    }
+    
+    @Override
+    public String toString(boolean withHeader){
+        StringBuilder sb = new StringBuilder();
+        if(withHeader){
+            sb.append(Types.getNamesToString());
+        }
+        EnumMap<Types, Double> metrics = countMetrics();
+        for(Entry<Types, Double> entry: metrics.entrySet()){
+            sb.append(Utils.roundDouble(entry.getValue())).append("\t");
+        }
+        sb.append("\n");
+        return sb.toString();
     }
     
     public static UnrangedMetrics avg(List<UnrangedMetrics> unrangedMetricses){
@@ -88,23 +110,6 @@ public class UnrangedMetrics {
             sums[i] /= unrangedMetricses.size();
         }
         return new UnrangedMetrics(sums, unrangedMetricses.get(0).cnt);
-    }
-    
-    public String headerToString(){
-        return Types.getNamesToString();  
-    }
-    
-    public String toString(boolean withHeader){
-        StringBuilder sb = new StringBuilder();
-        if(withHeader){
-            sb.append(Types.getNamesToString());
-        }
-        EnumMap<Types, Double> metrics = countMetrics();
-        for(Entry<Types, Double> entry: metrics.entrySet()){
-            sb.append(Utils.roundDouble(entry.getValue())).append("\t");
-        }
-        sb.append("\n");
-        return sb.toString();
     }
     
     public static String listToString(List<UnrangedMetrics> unrangedMetricses){
