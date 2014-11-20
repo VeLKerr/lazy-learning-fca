@@ -152,8 +152,8 @@ public class Task {
         System.out.println("******* AVERAGE *************");
         System.out.println(UnrangedMetrics.avg(unrangedMetricses).toString(false));
         System.out.println("");
-//        System.out.println(RangedMetrics.listToString(rangedMetricses));
-//        System.out.println("******* AVERAGE *************");
-//        System.out.println(RangedMetrics.avg(rangedMetricses).toString(false));
+        System.out.println(RangedMetrics.listToString(rangedMetricses));
+        System.out.println("******* AVERAGE *************");
+        System.out.println(RangedMetrics.avg(rangedMetricses).toString(false));
     }
 }
