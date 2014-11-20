@@ -77,19 +77,19 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
                 return "FPR.";
             }
         },
-        ALPHA_ERROR(true) {
+        ALPHA_ERROR(false) {
             @Override
             protected String getShortName() {
                 return "a-err";
             }
         },
-        BETA_ERROR(true) {
+        BETA_ERROR(false) {
             @Override
             protected String getShortName() {
                 return "b-err";
             }
         },
-        MATTHEW(true) {
+        MATTHEW(false) {
             @Override
             protected String getShortName() {
                 return "Matthew";
@@ -126,14 +126,23 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
     
     public RangedMetrics(){
         this.cnts = new double[LabelTypes.values().length];
-        Arrays.fill(cnts, 0.1); //0,1 - чтоб не было NaN. В принципе, этот трюк
+        Arrays.fill(cnts, 0.01); //0,01 - чтоб не было NaN. В принципе, этот трюк
         //аналогичен смещению Лапласса
     }
     
     @Override
     protected EnumMap<Types, Double> countMetrics(){
+        EnumMap<Types, Double> map = new EnumMap(Types.class);
         double sum = Utils.sum(cnts);
-        return null; //TODO: Metrics
+        map.put(Types.ACCURACY, 
+                (double)(cnts[LabelTypes.TruePositive.ordinal()] + cnts[LabelTypes.TrueNegative.ordinal()]) / sum);
+        map.put(Types.PRECISION, 
+                (double)(cnts[LabelTypes.TruePositive.ordinal()]) / (cnts[LabelTypes.TruePositive.ordinal()] + cnts[LabelTypes.FalsePositive.ordinal()]));
+        map.put(Types.RECALL, 
+                (double)(cnts[LabelTypes.TruePositive.ordinal()]) / (cnts[LabelTypes.TruePositive.ordinal()] + cnts[LabelTypes.FalseNegative.ordinal()]));
+        map.put(Types.F_MEASURE, (double)(2 * cnts[LabelTypes.TruePositive.ordinal()]) / 
+                (2 * cnts[LabelTypes.TruePositive.ordinal()] + cnts[LabelTypes.FalsePositive.ordinal()] + cnts[LabelTypes.FalseNegative.ordinal()]));
+        return map;
     }
     
     @Override
