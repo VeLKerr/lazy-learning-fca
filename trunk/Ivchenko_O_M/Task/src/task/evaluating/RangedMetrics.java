@@ -15,10 +15,41 @@ import task.utils.Utils;
 public class RangedMetrics extends Metrics<RangedMetrics.Types>{
     private static final int DELIMITER = 1;
     private enum LabelTypes {
-        TruePositive, 
-        FalseNegative, 
-        FalsePositive,
-        TrueNegative
+        TruePositive {
+            @Override
+            protected String getShortName(){
+                return "TP";
+            }
+        }, 
+        FalseNegative {
+            @Override
+            protected String getShortName(){
+                return "FN";
+            }
+        }, 
+        FalsePositive {
+            @Override
+            protected String getShortName(){
+                return "FP";
+            }
+        },
+        TrueNegative {
+            @Override
+            protected String getShortName(){
+                return "TN";
+            }
+        };
+        
+        protected abstract String getShortName();
+        
+        public static String getNamesToString(){
+            StringBuilder sb = new StringBuilder();
+            for(LabelTypes lt: values()){
+                sb.append(lt.getShortName()).append("\t");
+            }
+            sb.append("\n");
+            return sb.toString();
+        }
     };
     protected enum Types{
         ACCURACY(true) {
@@ -167,12 +198,36 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
         return Types.getNamesToString();
     }
     
+    public String basicToString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t\tPOS\tNEG");
+        sb.append("POS\t").append(cnts[LabelTypes.TruePositive.ordinal()]);
+        sb.append("\t").append(cnts[LabelTypes.FalsePositive.ordinal()]);
+        sb.append("NEG\t").append(cnts[LabelTypes.FalseNegative.ordinal()]);
+        sb.append("\t").append(cnts[LabelTypes.TrueNegative.ordinal()]);
+        sb.append("\n");
+        return sb.toString();
+    }
+    
+    public String basicNoRangedToString(boolean withHeader){
+        StringBuilder sb = new StringBuilder();
+        if(withHeader){
+            sb.append(LabelTypes.getNamesToString());
+        }
+        for(LabelTypes lt: LabelTypes.values()){
+            sb.append(Utils.roundDouble(cnts[lt.ordinal()], 0)).append("\t");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+    
     @Override
     public String toString(boolean withHeader){
         StringBuilder sb = new StringBuilder();
         if(withHeader){
             sb.append(Types.getNamesToString());
         }
+        basicToString();
         EnumMap<Types, Double> metrics = countMetrics();
         for(Entry<Types, Double> entry: metrics.entrySet()){
             if(entry.getKey().isVisible){
@@ -197,7 +252,11 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
     }
     
     public static String listToString(List<RangedMetrics> rangedMetricses){
-        StringBuilder sb = new StringBuilder(Types.getNamesToString());
+        StringBuilder sb = new StringBuilder(LabelTypes.getNamesToString());
+        for(RangedMetrics rangedMetrics: rangedMetricses){
+            sb.append(rangedMetrics.basicNoRangedToString(false));
+        }
+        sb.append("\n").append(Types.getNamesToString());
         for(RangedMetrics rangedMetrics: rangedMetricses){
             sb.append(rangedMetrics.toString(false));
         }

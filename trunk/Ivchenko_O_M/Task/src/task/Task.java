@@ -84,7 +84,6 @@ public class Task {
                     maxCoef = entry.getValue().getCoef(i);
                 }
             }
-//            List<Acceptability> sameList = new ArrayList<>();
             for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
                 if(entry.getValue().getCoef(i) != maxCoef){
                     assocRules.remove(entry.getKey());
@@ -93,9 +92,57 @@ public class Task {
             if(assocRules.size() == 1){
                 assocRules.keySet().iterator().next();
             }
-//            if(sameList.size() == 1){
-//                return sameList.get(0);
-//            }
+        }
+        if(assocRules.size() != 1){
+            int index = Consts.RANDOM.nextInt(assocRules.size());
+            int ind = 0;
+            Iterator<Acceptability> it = assocRules.keySet().iterator();
+            while(it.hasNext() && ind <= index){
+                result = it.next();
+                ind++;
+            }
+        }
+        return result;
+    }
+    
+    private static Acceptability classificationOnCnt(Set<Classificator> classificators, double lim){
+        Acceptability result = classificationImplic(classificators);
+        if(result != null){
+            return result;
+        }
+        //если не нашли ни одной импликации
+        EnumMap<Acceptability, AssociationRulesOnCnt> assocRules = new EnumMap(Acceptability.class);
+        Utils.initEnumMap(assocRules, new AssociationRulesOnCnt(lim));
+        //считаем максимальные коэффициенты по ассоциативным правилам
+        for(Classificator cl: classificators){
+            if(!cl.isImplication()){
+                for(Entry<Acceptability, AssociationRulesOnCnt> entry: assocRules.entrySet()){
+                    entry.getValue().takeIntoAccount(cl, entry.getKey());
+                }
+            }
+        }
+        /*Сравниваем сначала по достоверности. Если макс. достоверность правил 
+        для какого-то значения целевого признака оказалась наибольшей, это значение
+        признака и будет результатом. Если таких наибольших несколько, сравниваем
+        ещё и по макс. поддержке.
+        Если значений целевого признака снова получилось несколько, сравниваем их 
+        по мин. мощности ассоц. правил. Далее - просто по количеству.
+        */
+        for(int i = 0; i<AssociationRulesOnExtremums.COEFS_CNT; i++){
+            double maxCoef = 0.0;
+            for(Entry<Acceptability, AssociationRulesOnCnt> entry: assocRules.entrySet()){
+                if(entry.getValue().getCoef(i) > maxCoef){
+                    maxCoef = entry.getValue().getCoef(i);
+                }
+            }
+            for(Entry<Acceptability, AssociationRulesOnCnt> entry: assocRules.entrySet()){
+                if(entry.getValue().getCoef(i) != maxCoef){
+                    assocRules.remove(entry.getKey());
+                }
+            }
+            if(assocRules.size() == 1){
+                assocRules.keySet().iterator().next();
+            }
         }
         if(assocRules.size() != 1){
             int index = Consts.RANDOM.nextInt(assocRules.size());
@@ -116,7 +163,7 @@ public class Task {
         List<Element> elements = new ArrayList<>();
         List<UnrangedMetrics> unrangedMetricses = new ArrayList<>();
         List<RangedMetrics> rangedMetricses = new ArrayList<>();
-        for(int i=0; i<1; i++){
+        for(int i=0; i<Consts.CROSSVAL_CNT; i++){
             UnrangedMetrics unrangedMetrics = new UnrangedMetrics();
             RangedMetrics rangedMetrics = new RangedMetrics();
             int[] testIndexes = DataSplitter.getInstance().generateIndexes();

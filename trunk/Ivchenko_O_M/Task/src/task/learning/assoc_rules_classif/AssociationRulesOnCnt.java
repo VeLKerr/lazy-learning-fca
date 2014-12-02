@@ -9,7 +9,6 @@ import task.learning.Classificator;
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
 public class AssociationRulesOnCnt extends AssociationRules{
-    private final double lim;
 
     public AssociationRulesOnCnt(double lim) {
         this.power = 0;

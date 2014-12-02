@@ -9,6 +9,7 @@ import task.learning.Classificator;
  */
 public abstract class AssociationRules {
     public static final int COEFS_CNT = 4;
+    protected double lim;
     protected int power;
     protected double confidence;
     protected double support;
