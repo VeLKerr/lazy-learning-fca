@@ -5,16 +5,20 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import task.crossvalidation.DataSplitter;
 import task.evaluating.RangedMetrics;
 import task.evaluating.UnrangedMetrics;
 import task.learning.Acceptability;
-import task.learning.assoc_rules_classif.AssociationRulesOnExtremums;
 import task.learning.Classificator;
 import task.learning.Element;
+import task.learning.assoc_rules_classif.AssociationRules;
+import task.learning.assoc_rules_classif.AssociationRulesOnCnt;
+import task.learning.assoc_rules_classif.AssociationRulesOnExtremums;
 import task.utils.Utils;
 
 /**
@@ -23,6 +27,7 @@ import task.utils.Utils;
  */
 public class Task {
     public static abstract class Consts{
+        public static final Random RANDOM = new Random(System.currentTimeMillis());
         public static final int SYMBOLS_AFTER_COMMA = 3;
         public static final String INPUT = "../../data_sets/cars/car.data";
         public static final int SIZE = 1728;
@@ -30,7 +35,7 @@ public class Task {
         public static final int CROSSVAL_CNT = 10;
     }
     
-    private static Acceptability classification(Set<Classificator> classificators){
+    private static Acceptability classificationImplic(Set<Classificator> classificators){
         EnumMap<Acceptability, Integer> implications = new EnumMap(Acceptability.class);
         Utils.initEnumMap(implications, 0);
         for(Classificator cl: classificators){
@@ -39,51 +44,66 @@ public class Task {
             }
         }
         int max = 0;
-        Acceptability result = Acceptability.UNACC;
+        Acceptability result = null;
         for(Entry<Acceptability, Integer> entry: implications.entrySet()){
             if(entry.getValue() > max){
                 max = entry.getValue();
                 result = entry.getKey();
             }
         }
+        return result;
+    }
+    
+    private static Acceptability classificationOnExtr(Set<Classificator> classificators){
+        Acceptability result = classificationImplic(classificators);
+        if(result != null){
+            return result;
+        }
         //если не нашли ни одной импликации
-        if(Utils.mapIsEmpty(implications)){
-            EnumMap<Acceptability, AssociationRulesOnExtremums> assocRules = new EnumMap(Acceptability.class);
-            Utils.initEnumMap(assocRules, new AssociationRulesOnExtremums());
-            //считаем максимальные коэффициенты по ассоциативным правилам
-            for(Classificator cl: classificators){
-                if(!cl.isImplication()){
-                    for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
-                        entry.getValue().takeIntoAccount(cl, entry.getKey());
-                    }
+        EnumMap<Acceptability, AssociationRulesOnExtremums> assocRules = new EnumMap(Acceptability.class);
+        Utils.initEnumMap(assocRules, new AssociationRulesOnExtremums());
+        //считаем максимальные коэффициенты по ассоциативным правилам
+        for(Classificator cl: classificators){
+            if(!cl.isImplication()){
+                for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
+                    entry.getValue().takeIntoAccount(cl, entry.getKey());
                 }
             }
-            /*Сравниваем сначала по достоверности. Если макс. достоверность правил 
-            для какого-то значения целевого признака оказалась наибольшей, это значение
-            признака и будет результатом. Если таких наибольших несколько, сравниваем
-            ещё и по макс. поддержке.
-            Если значений целевого признака снова получилось несколько, сравниваем их 
-            по мин. мощности ассоц. правил. Далее - просто по количеству.
-            */
-            for(int i = 0; i<AssociationRulesOnExtremums.COEFS_CNT; i++){
-                double maxCoef = 0.0;
-                for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
-                    if(entry.getValue().getCoef(i) > maxCoef){
-                        maxCoef = entry.getValue().getCoef(i);
-                    }
+        }
+        /*Сравниваем сначала по достоверности. Если макс. достоверность правил 
+        для какого-то значения целевого признака оказалась наибольшей, это значение
+        признака и будет результатом. Если таких наибольших несколько, сравниваем
+        ещё и по макс. поддержке.
+        Если значений целевого признака снова получилось несколько, сравниваем их 
+        по мин. мощности ассоц. правил. Далее - просто по количеству.
+        */
+        for(int i = 0; i<AssociationRulesOnExtremums.COEFS_CNT; i++){
+            double maxCoef = 0.0;
+            for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
+                if(entry.getValue().getCoef(i) > maxCoef){
+                    maxCoef = entry.getValue().getCoef(i);
                 }
-                List<Acceptability> sameList = new ArrayList<>();
-                for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
-                    if(entry.getValue().getCoef(i) == maxCoef){
-                        sameList.add(entry.getKey());
-                    }
+            }
+//            List<Acceptability> sameList = new ArrayList<>();
+            for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
+                if(entry.getValue().getCoef(i) != maxCoef){
+                    assocRules.remove(entry.getKey());
                 }
-                if(sameList.size() == 1){
-                    if(sameList.get(0) != Acceptability.UNACC){
-                        System.out.println("Yes!");
-                    }
-                    return sameList.get(0);
-                }
+            }
+            if(assocRules.size() == 1){
+                assocRules.keySet().iterator().next();
+            }
+//            if(sameList.size() == 1){
+//                return sameList.get(0);
+//            }
+        }
+        if(assocRules.size() != 1){
+            int index = Consts.RANDOM.nextInt(assocRules.size());
+            int ind = 0;
+            Iterator<Acceptability> it = assocRules.keySet().iterator();
+            while(it.hasNext() && ind <= index){
+                result = it.next();
+                ind++;
             }
         }
         return result;
@@ -96,10 +116,11 @@ public class Task {
         List<Element> elements = new ArrayList<>();
         List<UnrangedMetrics> unrangedMetricses = new ArrayList<>();
         List<RangedMetrics> rangedMetricses = new ArrayList<>();
-        for(int i=0; i<Consts.CROSSVAL_CNT; i++){
+        for(int i=0; i<1; i++){
             UnrangedMetrics unrangedMetrics = new UnrangedMetrics();
             RangedMetrics rangedMetrics = new RangedMetrics();
             int[] testIndexes = DataSplitter.getInstance().generateIndexes();
+            //System.out.println(testIndexes[0] + " " + testIndexes[1]);
             int elementCnt = 0;
             try(RandomAccessFile rsf = new RandomAccessFile(Consts.INPUT, "r")){
                 String line = null;
@@ -131,7 +152,7 @@ public class Task {
                             }
                         }
                         //классификация
-                        Acceptability classificationRes = classification(classificators);
+                        Acceptability classificationRes = classificationOnExtr(classificators);
                         //оценка алгоритма
                         unrangedMetrics.takeIntoAccount(classificationRes, newEl.getAcceptability());
                         rangedMetrics.takeIntoAccount(classificationRes, newEl.getAcceptability());

@@ -8,11 +8,7 @@ import task.learning.Classificator;
  *
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public class AssociationRulesOnExtremums implements AssociationRules{
-    private int power;
-    private double confidence;
-    private double support;
-    private int cnt;
+public class AssociationRulesOnExtremums extends AssociationRules{
     
     public AssociationRulesOnExtremums() {
         this.power = Integer.MAX_VALUE;
@@ -37,24 +33,6 @@ public class AssociationRulesOnExtremums implements AssociationRules{
                 power = pow;
             }
             cnt++;
-        }
-    }
-
-    @Override
-    public double getCoef(int coefImportanceCnt) {
-        switch(coefImportanceCnt){
-            case 0:{
-                return confidence;
-            }
-            case 1:{
-                return support;
-            }
-            case 2:{
-                return cnt;
-            }
-            default:{
-                return power;
-            }
         }
     }
 }

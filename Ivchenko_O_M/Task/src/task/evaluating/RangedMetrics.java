@@ -1,11 +1,9 @@
 
 package task.evaluating;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import task.learning.Acceptability;
 import task.utils.Utils;
@@ -47,7 +45,7 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
                 return "F1";
             }
         },
-        NEGATIVE_PRECISION(false) {
+        NEGATIVE_PRECISION(true) {
             @Override
             protected String getShortName() {
                 return "N.Prec.";
@@ -142,6 +140,10 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
                 (double)(cnts[LabelTypes.TruePositive.ordinal()]) / (cnts[LabelTypes.TruePositive.ordinal()] + cnts[LabelTypes.FalseNegative.ordinal()]));
         map.put(Types.F_MEASURE, (double)(2 * cnts[LabelTypes.TruePositive.ordinal()]) / 
                 (2 * cnts[LabelTypes.TruePositive.ordinal()] + cnts[LabelTypes.FalsePositive.ordinal()] + cnts[LabelTypes.FalseNegative.ordinal()]));
+        map.put(Types.NEGATIVE_PRECISION,
+                (double)(cnts[LabelTypes.TrueNegative.ordinal()]) / (cnts[LabelTypes.TrueNegative.ordinal()] + cnts[LabelTypes.FalseNegative.ordinal()]));
+        map.put(Types.SPECIFYCITY, 
+                (double)(cnts[LabelTypes.TrueNegative.ordinal()]) / (cnts[LabelTypes.TrueNegative.ordinal()] + cnts[LabelTypes.FalsePositive.ordinal()]));
         return map;
     }
     
