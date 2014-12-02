@@ -15,6 +15,7 @@ public class AssociationRulesOnExtremums extends AssociationRules{
         this.confidence = 0.0;
         this.support = 0.0;
         this.cnt = 0;
+        this.lim = 0.0;
     }
 
     @Override

@@ -18,7 +18,7 @@ public abstract class Utils {
      * @param symbolsAfterComma кол-во знаков после запятой в округлённом числе.
      * @return округлённое дробное число.
      */
-    private static double roundDouble(double value, int symbolsAfterComma){
+    public static double roundDouble(double value, int symbolsAfterComma){
         return new BigDecimal(value).setScale(symbolsAfterComma, RoundingMode.HALF_UP).doubleValue();
     }
     
