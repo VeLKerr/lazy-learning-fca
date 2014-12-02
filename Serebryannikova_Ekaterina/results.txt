@@ -1,0 +1,50 @@
+1.rule 1:
+#'+':conf((g'&g(i)')->'+')>min_conf
+#'-':conf((g'&g(i)')->'-')>min_conf
+1.1.#'+'>#'-' then '+' else '-'
+1.2.#'+'>=#'-' then '+' else '-'	
+	1.1. min_conf=0.88
+		{'1_0': 24, '0_0': 9, '0_1': 6, '1_1': 148}
+		0.83957219251336
+		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.839572192513369 
+ 		Precision=TP/(TP+FP)= 0.961038961038961 
+ 		Sensitivity=TN/(TN+FN)= 0.2727272727272727 
+ 		Specificity=TN/(FP+TN)= 0.6 
+ 		F1=2*TP/(2*TP+FP+FN)= 0.9079754601226994 
+ 		NPV=TN/(TN+FN)= 0.2727272727272727
+	1.2. min_conf=0.88
+		{'0_1': 6, '1_1': 155, '0_0': 9, '1_0': 17}
+ 		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.8770053475935828 
+		Precision=TP/(TP+FP)= 0.9627329192546584 
+ 		Sensitivity=TN/(TN+FN)= 0.34615384615384615 
+		Specificity=TN/(FP+TN)= 0.6 
+ 		F1=2*TP/(2*TP+FP+FN)= 0.9309309309309309 
+ 		NPV=TN/(TN+FN)= 0.34615384615384615
+
+
+2.rule 2:
+сумма достоверностей
+{'0_1': 15, 'contradictory': 0, '1_0': 0, '0_0': 0, '1_1': 172}
+0.9197860962566845
+!!!Ќи одного нул€!!!
+
+3.rule 3:
+сумма достоверностей, но прибавл€ем достоверность только если она больше порога min_conf
+if conf_plus[i]>min_conf -> conf_plus+=conf_plus[i] 
+
+{'1_1': 119, '0_1': 3, '0_0': 12, '1_0': 53}
+min conf= 0.8 
+ accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.7005347593582888 
+ Precision=TP/(TP+FP)= 0.9754098360655737 
+ Sensitivity=TN/(TN+FN)= 0.18461538461538463 
+ Specificity=TN/(FP+TN)= 0.8 
+ F1=2*TP/(2*TP+FP+FN)= 0.8095238095238095 
+ NPV=TN/(TN+FN)= 0.18461538461538463
+
+min conf= 0.75 
+ accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.6524064171122995 
+ Precision=TP/(TP+FP)= 0.9819819819819819 
+ Sensitivity=TN/(TN+FN)= 0.17105263157894737 
+ Specificity=TN/(FP+TN)= 0.8666666666666667 
+ F1=2*TP/(2*TP+FP+FN)= 0.7703180212014135 
+ NPV=TN/(TN+FN)= 0.17105263157894737
