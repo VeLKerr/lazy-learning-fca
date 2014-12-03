@@ -217,11 +217,15 @@ public class Task {
             }
         }
         System.out.println(UnrangedMetrics.listToString(unrangedMetricses));
-        System.out.println("******* AVERAGE *************");
+        Utils.avgConsole(10, 15);
         System.out.println(UnrangedMetrics.avg(unrangedMetricses).toString(false));
-        System.out.println("");
-        System.out.println(RangedMetrics.listToString(rangedMetricses));
-        System.out.println("******* AVERAGE *************");
-        System.out.println(RangedMetrics.avg(rangedMetricses).toString(false));
+        
+        RangedMetrics avgRM = RangedMetrics.avg(rangedMetricses);
+        System.out.println(RangedMetrics.listToString(rangedMetricses, true));
+        Utils.avgConsole(10, 15);
+        System.out.println(avgRM.basicNoRangedToString(false));
+        System.out.println(RangedMetrics.listToString(rangedMetricses, false));
+        Utils.avgConsole(10, 15);
+        System.out.println(avgRM.toString(false));
     }
 }

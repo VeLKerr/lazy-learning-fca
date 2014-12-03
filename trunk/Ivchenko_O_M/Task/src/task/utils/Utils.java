@@ -48,4 +48,16 @@ public abstract class Utils {
         }
         return sum;
     }
+    
+    public static void avgConsole(int pre, int post){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<pre; i++){
+            sb.append("*");
+        }
+        sb.append(" AVERAGE ");
+        for(int i=0; i<post; i++){
+            sb.append("*");
+        }
+        System.out.println(sb.toString());
+    }
 }
