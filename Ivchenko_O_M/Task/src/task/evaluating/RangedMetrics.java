@@ -251,14 +251,19 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
         return res;
     }
     
-    public static String listToString(List<RangedMetrics> rangedMetricses){
-        StringBuilder sb = new StringBuilder(LabelTypes.getNamesToString());
-        for(RangedMetrics rangedMetrics: rangedMetricses){
-            sb.append(rangedMetrics.basicNoRangedToString(false));
+    public static String listToString(List<RangedMetrics> rangedMetricses, boolean isBasic){
+        StringBuilder sb = new StringBuilder();
+        if(isBasic){
+            sb.append(LabelTypes.getNamesToString());
+            for(RangedMetrics rangedMetrics: rangedMetricses){
+                sb.append(rangedMetrics.basicNoRangedToString(false));
+            }
         }
-        sb.append("\n").append(Types.getNamesToString());
-        for(RangedMetrics rangedMetrics: rangedMetricses){
-            sb.append(rangedMetrics.toString(false));
+        else{
+            sb.append(Types.getNamesToString());
+            for(RangedMetrics rangedMetrics: rangedMetricses){
+                sb.append(rangedMetrics.toString(false));
+            }
         }
         return sb.toString();
     }
