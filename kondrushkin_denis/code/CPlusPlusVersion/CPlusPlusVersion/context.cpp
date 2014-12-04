@@ -2,9 +2,15 @@
 
 /* constructors & destructors */
 
-Context::Context(const char* path, const int num_attrs, Loader& loader)
+Context::Context(
+	const int num_attrs,
+	const std::vector<const char*>& positive_context,
+	const std::vector<const char*>& negative_context)
+	: _num_attrs(num_attrs), _positive_context(positive_context), _negative_context(negative_context){}
+
+Context::Context(const int num_attrs, Loader& loader)
 	:_num_attrs(num_attrs){
-	loader.load_context(path, num_attrs, _positive_context, _negative_context);
+	loader.load_context(num_attrs, _positive_context, _negative_context);
 }
 
 Context::~Context(){
@@ -21,9 +27,9 @@ Context::~Context(){
 
 int Context::len(bool positive) const{
 	if(positive){
-		return _positive_context.size();
+		return (int)_positive_context.size();
 	} else {
-		return _negative_context.size();
+		return (int)_negative_context.size();
 	}
 }
 

@@ -1,10 +1,8 @@
 #pragma once
 
 #include <vector>
+#include "defines.h"
 #include "loader.h"
-
-
-#define MISS_CHAR '.'
 
 
 class Context {
@@ -15,7 +13,8 @@ private:
 	int _num_attrs;
 
 public:
-	Context(const char* path, const int num_attrs, Loader& load_contexter);
+	Context(const int num_attrs, const std::vector<const char*>& positive_context, const std::vector<const char*>& negative_context);
+	Context(const int num_attrs, Loader& loader);
 	~Context();
 
 private:

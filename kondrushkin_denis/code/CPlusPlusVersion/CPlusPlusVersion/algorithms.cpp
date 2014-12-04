@@ -3,24 +3,20 @@
 
 /* Base Algorithm Class */
 
-Algorithm::Algorithm(const char* path, const int num_attrs, const Loader& loader, const Context& context)
-	:_num_attrs(num_attrs), _context(context){
-	loader.load_test_data(path, num_attrs,_test_data);
+Algorithm::Algorithm(const Context& context, const Data& test_data)
+	:_num_attrs(context.get_num_attrs()), _context(context), _test_data(test_data){
 }
 
-Algorithm::~Algorithm(){
-	for each(const char* ch in _test_data){
-		delete[] ch;
-	}
-}
+Algorithm::~Algorithm(){}
+
 
 /* SimpleLazyAlgorithm */
 
-SimpleLazyAlgorithm::SimpleLazyAlgorithm(const char* path, const int num_attrs, const Loader& loader, const Context& context)
-	:Algorithm(path, num_attrs, loader, context){}
+SimpleLazyAlgorithm::SimpleLazyAlgorithm(const Context& context, const Data& test_data)
+	:Algorithm(context, test_data){}
 
-void SimpleLazyAlgorithm::classify(std::vector<char>& res) const {
-	size_t n = _test_data.size();
+void SimpleLazyAlgorithm::classify(std::vector<char*>& res) const {
+	int n = _test_data.len();
 	for(int  i = 0; i < n; i++){
 		bool is_positive = true;
 		bool is_negative = true;
@@ -55,21 +51,25 @@ void SimpleLazyAlgorithm::classify(std::vector<char>& res) const {
 			is_undefined = true;
 		}
 
+		char *ch = new char[2];
+		ch[1] = '\0';
 		if(is_undefined){
-			res.push_back(UNDEFINED_CHAR);
+			ch[0] = UNDEFINED_CHAR;
 		}else{
-			res.push_back((is_positive) ? POSITIVE_CHAR : NEGATIVE_CHAR);
+			ch[0] = is_positive ? POSITIVE_CHAR : NEGATIVE_CHAR;
 		}
+		res.push_back(ch);
 	}
 }
 
+
 /* FreqLazyAlgorithm */
 
-FreqLazyAlgorithm::FreqLazyAlgorithm(const char* path, const int num_attrs, const Loader& loader, const Context& context)
-	:Algorithm(path, num_attrs, loader, context){}
+FreqLazyAlgorithm::FreqLazyAlgorithm(const Context& context, const Data& test_data)
+	:Algorithm(context, test_data){}
 
-void FreqLazyAlgorithm::classify(std::vector<char>& res) const {
-	size_t n = _test_data.size();
+void FreqLazyAlgorithm::classify(std::vector<char*>& res) const {
+	int n = _test_data.len();
 	for(int  i = 0; i < n; i++){
 		bool is_positive = true;
 		bool is_negative = true;
@@ -132,10 +132,13 @@ void FreqLazyAlgorithm::classify(std::vector<char>& res) const {
 			is_undefined = true;
 		}
 
+		char *ch = new char[2];
+		ch[1] = '\0';
 		if(is_undefined){
-			res.push_back(UNDEFINED_CHAR);
+			ch[0] = UNDEFINED_CHAR;
 		}else{
-			res.push_back((is_positive) ? POSITIVE_CHAR : NEGATIVE_CHAR);
+			ch[0] = is_positive ? POSITIVE_CHAR : NEGATIVE_CHAR;
 		}
+		res.push_back(ch);
 	}
 }
