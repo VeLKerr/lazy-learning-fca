@@ -109,13 +109,18 @@
   <ItemGroup>
     <ClCompile Include="algorithms.cpp" />
     <ClCompile Include="context.cpp" />
+    <ClCompile Include="cross_validation.cpp" />
     <ClCompile Include="loader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algorithms.h" />
     <ClInclude Include="context.h" />
+    <ClInclude Include="cross_validation.h" />
+    <ClInclude Include="defines.h" />
     <ClInclude Include="loader.h" />
+    <ClInclude Include="data.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
