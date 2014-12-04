@@ -116,7 +116,6 @@
     <ClInclude Include="algorithms.h" />
     <ClInclude Include="context.h" />
     <ClInclude Include="loader.h" />
-    <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
