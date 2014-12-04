@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <math.h>
 #include "context.h"
 #include "loader.h"
 
@@ -14,18 +15,24 @@ class Algorithm{
 protected:
 	std::vector<const char*> _test_data;
 	const Context& _context;
-	int _num_attrs;
+	const int _num_attrs;
 
 public:
 	Algorithm(const char* path, const int num_attrs, const Loader& loader, const Context& context);
 	virtual ~Algorithm();
-	virtual void classify(std::vector<char>& res) = 0;
+	virtual void classify(std::vector<char>& res) const = 0;
 };
 
 class SimpleLazyAlgorithm : public Algorithm {
 public:
 	SimpleLazyAlgorithm(const char* path, const int num_attrs, const Loader& loader, const Context& context);
-	void classify(std::vector<char>& res);
+	void classify(std::vector<char>& res) const;
+};
+
+class FreqLazyAlgorithm : public Algorithm {
+public:
+	FreqLazyAlgorithm(const char* path, const int num_attrs, const Loader& loader, const Context& context);
+	void classify(std::vector<char>& res) const;
 };
 
 

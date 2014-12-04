@@ -18,14 +18,14 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="context.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="loader.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="context.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="algorithms.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,9 +33,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="algorithms.h">
