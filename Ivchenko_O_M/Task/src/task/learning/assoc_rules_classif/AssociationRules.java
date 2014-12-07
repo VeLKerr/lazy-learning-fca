@@ -9,7 +9,9 @@ import task.learning.Classificator;
  */
 public abstract class AssociationRules {
     public static final int COEFS_CNT = 4;
-    protected double lim;
+    private static double[] weights = {10.8, 4.5, -1.9, 1.1};
+    protected double confLim;
+    protected double suppLim;
     protected int power;
     protected double confidence;
     protected double support;
@@ -26,11 +28,19 @@ public abstract class AssociationRules {
                 return support;
             }
             case 2:{
-                return cnt;
-            }
-            default:{
                 return power;
             }
+            default:{
+                return cnt;
+            }
         }
+    }
+    
+    public double getWeightedValue(){
+        double sum = 0;
+        for(int i=0; i<weights.length; i++){
+            sum += weights[i] * getCoef(i);
+        }
+        return sum;
     }
 }

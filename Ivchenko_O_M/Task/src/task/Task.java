@@ -11,8 +11,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import task.crossvalidation.DataSplitter;
-import task.evaluating.RangedMetrics;
-import task.evaluating.UnrangedMetrics;
+import task.evaluating.RankedMetrics;
+import task.evaluating.UnrankedMetrics;
 import task.learning.Acceptability;
 import task.learning.Classificator;
 import task.learning.Element;
@@ -54,7 +54,71 @@ public class Task {
         return result;
     }
     
-    private static Acceptability classificationOnExtr(Set<Classificator> classificators){
+    public static <K extends AssociationRules> Acceptability weightedCalssif(EnumMap<Acceptability, K> map){
+        double max = -Double.MAX_VALUE;
+        //считаем максимальный вес
+        for(Entry<Acceptability, K> entry: map.entrySet()){
+            double localVal = entry.getValue().getWeightedValue();
+            if(localVal > max){
+                max = localVal;
+            }
+        }
+        //оставляем только те значения ЦП, у которых вес равен максимальному 
+        for(Entry<Acceptability, K> entry: map.entrySet()){
+            if(entry.getValue().getWeightedValue() < max){
+                map.remove(entry.getKey());
+            }
+        }
+        //Из оставшихся случайно выбираем ответ
+        Acceptability result = null;
+        if(map.size() == 1){
+            return map.keySet().iterator().next();
+        }
+        else if(!map.isEmpty()){
+            int number = Consts.RANDOM.nextInt(map.size());
+            int i = 0;
+            Iterator<Acceptability> it = map.keySet().iterator();
+            while(it.hasNext() && i < number){
+                result = it.next();
+                i++;
+            }
+        }
+        return result;
+    }
+    
+    public static Acceptability weightedCalssifCnt(EnumMap<Acceptability, AssociationRulesOnCnt> map){
+        double max = -Double.MAX_VALUE;
+        //считаем максимальный вес
+        for(Entry<Acceptability, AssociationRulesOnCnt> entry: map.entrySet()){
+            double localVal = entry.getValue().getWeightedValue();
+            if(localVal > max){
+                max = localVal;
+            }
+        }
+        //оставляем только те значения ЦП, у которых вес равен максимальному 
+        for(Entry<Acceptability, AssociationRulesOnCnt> entry: map.entrySet()){
+            if(entry.getValue().getWeightedValue() < max){
+                map.remove(entry.getKey());
+            }
+        }
+        //Из оставшихся случайно выбираем ответ
+        Acceptability result = null;
+        if(map.size() == 1){
+            return map.keySet().iterator().next();
+        }
+        else if(!map.isEmpty()){
+            int number = Consts.RANDOM.nextInt(map.size());
+            int i = 0;
+            Iterator<Acceptability> it = map.keySet().iterator();
+            while(it.hasNext() && i < number){
+                result = it.next();
+                i++;
+            }
+        }
+        return result;
+    }
+    
+    private static Acceptability classificationOnExtr(Set<Classificator> classificators, boolean isWeighted){
         Acceptability result = classificationImplic(classificators);
         if(result != null){
             return result;
@@ -70,6 +134,9 @@ public class Task {
                 }
             }
         }
+        if(isWeighted){
+            return weightedCalssif(assocRules);
+        }
         /*Сравниваем сначала по достоверности. Если макс. достоверность правил 
         для какого-то значения целевого признака оказалась наибольшей, это значение
         признака и будет результатом. Если таких наибольших несколько, сравниваем
@@ -77,7 +144,7 @@ public class Task {
         Если значений целевого признака снова получилось несколько, сравниваем их 
         по мин. мощности ассоц. правил. Далее - просто по количеству.
         */
-        for(int i = 0; i<AssociationRulesOnExtremums.COEFS_CNT; i++){
+        for(int i = 0; i<AssociationRules.COEFS_CNT; i++){
             double maxCoef = 0.0;
             for(Entry<Acceptability, AssociationRulesOnExtremums> entry: assocRules.entrySet()){
                 if(entry.getValue().getCoef(i) > maxCoef){
@@ -105,14 +172,14 @@ public class Task {
         return result;
     }
     
-    private static Acceptability classificationOnCnt(Set<Classificator> classificators, double lim){
+    private static Acceptability classificationOnCnt(Set<Classificator> classificators, double confLim, double suppLim, boolean isWeighted){
         Acceptability result = classificationImplic(classificators);
         if(result != null){
             return result;
         }
         //если не нашли ни одной импликации
         EnumMap<Acceptability, AssociationRulesOnCnt> assocRules = new EnumMap(Acceptability.class);
-        Utils.initEnumMap(assocRules, new AssociationRulesOnCnt(lim));
+        Utils.initEnumMap(assocRules, new AssociationRulesOnCnt(confLim, suppLim));
         //считаем максимальные коэффициенты по ассоциативным правилам
         for(Classificator cl: classificators){
             if(!cl.isImplication()){
@@ -121,14 +188,36 @@ public class Task {
                 }
             }
         }
-        /*Сравниваем сначала по достоверности. Если макс. достоверность правил 
-        для какого-то значения целевого признака оказалась наибольшей, это значение
-        признака и будет результатом. Если таких наибольших несколько, сравниваем
-        ещё и по макс. поддержке.
-        Если значений целевого признака снова получилось несколько, сравниваем их 
-        по мин. мощности ассоц. правил. Далее - просто по количеству.
-        */
-        for(int i = 0; i<AssociationRulesOnExtremums.COEFS_CNT; i++){
+        if(isWeighted){
+            double max = -Double.MAX_VALUE;
+            //считаем максимальный вес
+            for(Entry<Acceptability, AssociationRulesOnCnt> entry: assocRules.entrySet()){
+                double localVal = entry.getValue().getWeightedValue();
+                if(localVal > max){
+                    max = localVal;
+                }
+            }
+            //оставляем только те значения ЦП, у которых вес равен максимальному 
+            for(Entry<Acceptability, AssociationRulesOnCnt> entry: assocRules.entrySet()){
+                if(entry.getValue().getWeightedValue() < max){
+                    assocRules.remove(entry.getKey());
+                }
+            }
+            //Из оставшихся случайно выбираем ответ
+            if(assocRules.size() == 1){
+                return assocRules.keySet().iterator().next();
+            }
+            else{
+                int number = Consts.RANDOM.nextInt(assocRules.size());
+                int i = 0;
+                Iterator<Acceptability> it = assocRules.keySet().iterator();
+                while(it.hasNext() && i < number){
+                    result = it.next();
+                    i++;
+                }
+            }
+        }
+        for(int i = 0; i<AssociationRules.COEFS_CNT; i++){
             double maxCoef = 0.0;
             for(Entry<Acceptability, AssociationRulesOnCnt> entry: assocRules.entrySet()){
                 if(entry.getValue().getCoef(i) > maxCoef){
@@ -161,11 +250,11 @@ public class Task {
      */
     public static void main(String[] args) {
         List<Element> elements = new ArrayList<>();
-        List<UnrangedMetrics> unrangedMetricses = new ArrayList<>();
-        List<RangedMetrics> rangedMetricses = new ArrayList<>();
+        List<UnrankedMetrics> unrangedMetricses = new ArrayList<>();
+        List<RankedMetrics> rangedMetricses = new ArrayList<>();
         for(int i=0; i<Consts.CROSSVAL_CNT; i++){
-            UnrangedMetrics unrangedMetrics = new UnrangedMetrics();
-            RangedMetrics rangedMetrics = new RangedMetrics();
+            UnrankedMetrics unrangedMetrics = new UnrankedMetrics();
+            RankedMetrics rangedMetrics = new RankedMetrics();
             int[] testIndexes = DataSplitter.getInstance().generateIndexes();
             //System.out.println(testIndexes[0] + " " + testIndexes[1]);
             int elementCnt = 0;
@@ -199,7 +288,8 @@ public class Task {
                             }
                         }
                         //классификация
-                        Acceptability classificationRes = classificationOnExtr(classificators);
+                        Acceptability classificationRes = classificationOnCnt(classificators, 1, 1, true);
+                        //Acceptability classificationRes = classificationOnExtr(classificators, true);
                         //оценка алгоритма
                         unrangedMetrics.takeIntoAccount(classificationRes, newEl.getAcceptability());
                         rangedMetrics.takeIntoAccount(classificationRes, newEl.getAcceptability());
@@ -216,15 +306,15 @@ public class Task {
                 System.err.println("Unable to read the file!" + elementCnt);
             }
         }
-        System.out.println(UnrangedMetrics.listToString(unrangedMetricses));
+        System.out.println(UnrankedMetrics.listToString(unrangedMetricses));
         Utils.avgConsole(10, 15);
-        System.out.println(UnrangedMetrics.avg(unrangedMetricses).toString(false));
+        System.out.println(UnrankedMetrics.avg(unrangedMetricses).toString(false));
         
-        RangedMetrics avgRM = RangedMetrics.avg(rangedMetricses);
-        System.out.println(RangedMetrics.listToString(rangedMetricses, true));
+        RankedMetrics avgRM = RankedMetrics.avg(rangedMetricses);
+        System.out.println(RankedMetrics.listToString(rangedMetricses, true));
         Utils.avgConsole(10, 15);
         System.out.println(avgRM.basicNoRangedToString(false));
-        System.out.println(RangedMetrics.listToString(rangedMetricses, false));
+        System.out.println(RankedMetrics.listToString(rangedMetricses, false));
         Utils.avgConsole(10, 15);
         System.out.println(avgRM.toString(false));
     }

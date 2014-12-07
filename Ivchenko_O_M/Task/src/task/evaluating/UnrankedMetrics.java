@@ -13,7 +13,7 @@ import task.utils.Utils;
  *
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public class UnrangedMetrics extends Metrics<UnrangedMetrics.Types>{
+public class UnrankedMetrics extends Metrics<UnrankedMetrics.Types>{
     protected enum Types{
         MAE(true),
         RMSE(true),
@@ -49,13 +49,13 @@ public class UnrangedMetrics extends Metrics<UnrangedMetrics.Types>{
     private final double[] sums;
     private int cnt;
     
-    public UnrangedMetrics(){
+    public UnrankedMetrics(){
         this.cnt = 0;
         this.sums = new double[Types.relevamtMetricsCount()];
         Arrays.fill(sums, 0);
     }
 
-    private UnrangedMetrics(double [] sums, int cnt) {
+    private UnrankedMetrics(double [] sums, int cnt) {
         this.sums = sums;
         this.cnt = cnt;
     }
@@ -99,9 +99,9 @@ public class UnrangedMetrics extends Metrics<UnrangedMetrics.Types>{
         return sb.toString();
     }
     
-    public static UnrangedMetrics avg(List<UnrangedMetrics> unrangedMetricses){
+    public static UnrankedMetrics avg(List<UnrankedMetrics> unrangedMetricses){
         double[] sums = new double[Types.relevamtMetricsCount()]; //значения cnt у всех должны быть равны!
-        for(UnrangedMetrics unrangedMetrics: unrangedMetricses){
+        for(UnrankedMetrics unrangedMetrics: unrangedMetricses){
             for(int i=0; i<sums.length; i++){
                 sums[i] += unrangedMetrics.sums[i];
             }
@@ -109,12 +109,12 @@ public class UnrangedMetrics extends Metrics<UnrangedMetrics.Types>{
         for(int i=0; i<sums.length; i++){
             sums[i] /= unrangedMetricses.size();
         }
-        return new UnrangedMetrics(sums, unrangedMetricses.get(0).cnt);
+        return new UnrankedMetrics(sums, unrangedMetricses.get(0).cnt);
     }
     
-    public static String listToString(List<UnrangedMetrics> unrangedMetricses){
+    public static String listToString(List<UnrankedMetrics> unrangedMetricses){
         StringBuilder sb = new StringBuilder(Types.getNamesToString());
-        for(UnrangedMetrics unrangedMetrics: unrangedMetricses){
+        for(UnrankedMetrics unrangedMetrics: unrangedMetricses){
             sb.append(unrangedMetrics.toString(false));
         }
         return sb.toString();

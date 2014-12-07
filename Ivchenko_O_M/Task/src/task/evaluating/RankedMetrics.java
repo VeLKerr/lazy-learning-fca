@@ -12,7 +12,7 @@ import task.utils.Utils;
  *
  * @author Ivchenko Oleg (Kirius VeLKerr)
  */
-public class RangedMetrics extends Metrics<RangedMetrics.Types>{
+public class RankedMetrics extends Metrics<RankedMetrics.Types>{
     private static final int DELIMITER = 1;
     private enum LabelTypes {
         TruePositive {
@@ -153,7 +153,7 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
      */
     private final double[] cnts; //double, чтоб потом рассчитать среднее
     
-    public RangedMetrics(){
+    public RankedMetrics(){
         this.cnts = new double[LabelTypes.values().length];
         Arrays.fill(cnts, 0.01); //0,01 - чтоб не было NaN. В принципе, этот трюк
         //аналогичен смещению Лапласса
@@ -238,9 +238,9 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
         return sb.toString();
     }
     
-    public static RangedMetrics avg(List<RangedMetrics> rangedMetricses){
-        RangedMetrics res = new RangedMetrics();
-        for(RangedMetrics rangedMetrics: rangedMetricses){
+    public static RankedMetrics avg(List<RankedMetrics> rangedMetricses){
+        RankedMetrics res = new RankedMetrics();
+        for(RankedMetrics rangedMetrics: rangedMetricses){
             for(int i=0; i<res.cnts.length; i++){
                 res.cnts[i] += rangedMetrics.cnts[i];
             }
@@ -251,17 +251,17 @@ public class RangedMetrics extends Metrics<RangedMetrics.Types>{
         return res;
     }
     
-    public static String listToString(List<RangedMetrics> rangedMetricses, boolean isBasic){
+    public static String listToString(List<RankedMetrics> rangedMetricses, boolean isBasic){
         StringBuilder sb = new StringBuilder();
         if(isBasic){
             sb.append(LabelTypes.getNamesToString());
-            for(RangedMetrics rangedMetrics: rangedMetricses){
+            for(RankedMetrics rangedMetrics: rangedMetricses){
                 sb.append(rangedMetrics.basicNoRangedToString(false));
             }
         }
         else{
             sb.append(Types.getNamesToString());
-            for(RangedMetrics rangedMetrics: rangedMetricses){
+            for(RankedMetrics rangedMetrics: rangedMetricses){
                 sb.append(rangedMetrics.toString(false));
             }
         }
