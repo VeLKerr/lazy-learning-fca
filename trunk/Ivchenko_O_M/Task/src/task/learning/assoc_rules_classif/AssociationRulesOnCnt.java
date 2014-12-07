@@ -10,25 +10,24 @@ import task.learning.Classificator;
  */
 public class AssociationRulesOnCnt extends AssociationRules{
 
-    public AssociationRulesOnCnt(double lim) {
+    public AssociationRulesOnCnt(double confLim, double suppLim) {
         this.power = 0;
         this.confidence = 0.0;
         this.support = 0.0;
         this.cnt = 0;
-        this.lim = lim;
+        this.confLim = confLim;
+        this.suppLim = suppLim;
     }
     
     @Override
     public void takeIntoAccount(Classificator cl, Acceptability ac){
         double conf = cl.getConfidence(ac);
-        if(conf >= lim){
-            double supp = cl.getSupport(ac);
-            if(supp > 2){
-                power += cl.getPower();
-                support += supp;
-                confidence += conf;
-                cnt++;
-            }
+        double supp = cl.getSupport(ac);
+        if(conf >= confLim && supp >= suppLim){
+            power += cl.getPower();
+            support += supp;
+            confidence += conf;
+            cnt++;
         }
     }
 }
