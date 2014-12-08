@@ -31,6 +31,7 @@ private:
 
 public:
 	int get_num_attrs() const;
+	int len() const;
 
 	int positive_len() const;
 	int negative_len() const;

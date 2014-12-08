@@ -115,6 +115,10 @@ int Context::get_num_attrs() const
 	return _num_attrs;
 }
 
+int Context::len() const{
+	return len(true) + len(false);
+}
+
 int Context::positive_len() const{
 	return len(true);
 }

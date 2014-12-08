@@ -25,6 +25,7 @@ int main(){
 	algoritms.push_back(new StupidLazyAlgorithm());
 	algoritms.push_back(new HammingDistanceLazyAlgorithm());
 	algoritms.push_back(new HammDistWeightedAlgorithm());
+	algoritms.push_back(new HypothesisTestingAlgorithm());
 	
 	// validates
 	CrossValidator cross_validator = CrossValidator(input_data, k);
