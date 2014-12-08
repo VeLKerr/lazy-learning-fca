@@ -51,3 +51,12 @@ public:
 };
 
 
+class HypothesisTestingAlgorithm : public Algorithm {
+
+public:
+	HypothesisTestingAlgorithm();
+	HypothesisTestingAlgorithm(const Context* context, const Data* test_data);
+	void classify(std::vector<char*>& res) const;
+};
+
+
