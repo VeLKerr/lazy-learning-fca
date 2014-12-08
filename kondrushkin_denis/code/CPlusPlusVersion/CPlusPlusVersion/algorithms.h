@@ -42,3 +42,12 @@ public:
 };
 
 
+class HammDistWeightedAlgorithm : public Algorithm {
+
+public:
+	HammDistWeightedAlgorithm();
+	HammDistWeightedAlgorithm(const Context* context, const Data* test_data);
+	void classify(std::vector<char*>& res) const;
+};
+
+

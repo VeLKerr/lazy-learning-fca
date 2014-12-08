@@ -96,7 +96,7 @@ void CrossValidator::validate(const char* path, const std::vector<Algorithm*>& a
 	// prints header into file
 	std::ofstream ofile(path);
 	for each(Algorithm* alg in algorithms){
-		ofile << typeid(*alg).name() + strlen("class ") << '\t';
+		ofile << typeid(*alg).name() + strlen("class ") << ' ';
 	}
 	ofile << std::endl;
 
