@@ -10,29 +10,34 @@
 class Algorithm{
 
 protected:
-	const Data& _test_data;
-	const Context& _context;
-	const int _num_attrs;
+	const Context* _context;	// context for learning
+	const Data* _test_data;		// data for testing
 
 public:
-	Algorithm(const Context& context, const Data& test_data);
+	Algorithm();
+	Algorithm(const Context* context, const Data* test_data);
 	virtual ~Algorithm();
-	virtual void classify(std::vector<char*>& res) const = 0;
+
+public:
+	void set(const Context* context, const Data* test_data);	// sets context for learning and data for classifying.
+	virtual void classify(std::vector<char*>& res) const = 0;	// classifies test data
 };
 
 
-class SimpleLazyAlgorithm : public Algorithm {
+class StupidLazyAlgorithm : public Algorithm {
 
 public:
-	SimpleLazyAlgorithm(const Context& context, const Data& test_data);
+	StupidLazyAlgorithm();
+	StupidLazyAlgorithm(const Context* context, const Data* test_data);
 	void classify(std::vector<char*>& res) const;
 };
 
 
-class FreqLazyAlgorithm : public Algorithm {
+class HammingDistanceLazyAlgorithm : public Algorithm {
 
 public:
-	FreqLazyAlgorithm(const Context& context, const Data& test_data);
+	HammingDistanceLazyAlgorithm();
+	HammingDistanceLazyAlgorithm(const Context* context, const Data* test_data);
 	void classify(std::vector<char*>& res) const;
 };
 
