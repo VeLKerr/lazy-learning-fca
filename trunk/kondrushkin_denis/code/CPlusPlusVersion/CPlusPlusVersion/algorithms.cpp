@@ -64,7 +64,7 @@ void StupidLazyAlgorithm::classify(std::vector<char*>& res) const {
 			delete[] intersect;
 		}
 
-		// checks wether testing sample leads to contrudiction
+		// checks whether testing sample leads to contrudiction
 		if((is_positive && is_negative) || (!is_positive && !is_negative)){
 			is_undefined = true;
 		}
@@ -150,7 +150,120 @@ void HammingDistanceLazyAlgorithm::classify(std::vector<char*>& res) const {
 			is_positive = false;
 		}
 
-		// checks wether testing sample leads to contrudiction
+		// checks whether testing sample leads to contrudiction
+		if((is_positive && is_negative) || (!is_positive && !is_negative)){
+			is_undefined = true;
+		}
+
+		// sets answer for giving sample
+		char *ch = new char[2];
+		ch[1] = '\0';
+		if(is_undefined){
+			ch[0] = UNDEFINED_CHAR;
+		}else{
+			ch[0] = is_positive ? POSITIVE_CHAR : NEGATIVE_CHAR;
+		}
+		res.push_back(ch);
+	}
+}
+
+
+//************************************** HammingDistanceLazyAlgorithm Class **************************************/
+
+HammDistWeightedAlgorithm::HammDistWeightedAlgorithm(){}
+
+HammDistWeightedAlgorithm::HammDistWeightedAlgorithm(const Context* context, const Data* test_data)
+	:Algorithm(context, test_data){}
+
+void HammDistWeightedAlgorithm::classify(std::vector<char*>& res) const{
+
+	// gets number of attributes in given data
+	const int num_attrs = _test_data->get_num_attrs();		
+	
+	// sets weights for each size of inclusion
+	double weights[100];
+	for(long long i = 0; i < num_attrs; i++){
+		if(i < 1){
+			weights[i] = 0;
+		} else {
+			weights[i] =  pow((double)i, 45);
+		}
+	}
+
+	const int n = _test_data->len();
+	for(int  i = 0; i < n; i++){
+		bool is_positive = true;
+		bool is_negative = true;
+		bool is_undefined = false;
+
+		const int positive_len = _context->positive_len();
+		const int negative_len = _context->negative_len();
+
+		// gets current sample's intent
+		const char* test_intent = _test_data->at(i);
+		
+		// sets arrays for storing frequencies
+		double positive_freqs[100]; 
+		double negative_freqs[100]; 
+		for(int j = 0; j < num_attrs; j++){
+			positive_freqs[j] = 0;
+			negative_freqs[j] = 0;
+		}
+
+		// aggregates frequencies for positive training samples
+		for(int positive_intent_index = 0; positive_intent_index < positive_len; positive_intent_index++){
+			const char* positive_intent = _context->positive_at(positive_intent_index);
+
+			int num_matches = 0;
+			for(int j = 0; j < num_attrs; j++){
+				if(test_intent[j] == positive_intent[j]){
+					num_matches++;
+				}
+			}
+
+			for(int j = 0; j < num_attrs; j++){
+				if(test_intent[j] == positive_intent[j]){
+					positive_freqs[j]+= num_matches * weights[num_matches];
+				}
+			}
+
+		}
+
+		// aggregates frequencies for negative training samples
+		for(int negative_intent_index = 0; negative_intent_index < negative_len; negative_intent_index++){
+			const char* negative_intent = _context->negative_at(negative_intent_index);
+
+			int num_matches = 0;
+			for(int j = 0; j < num_attrs; j++){
+				if(test_intent[j] == negative_intent[j]){
+					num_matches++;
+				}
+			}
+
+			for(int j = 0; j < num_attrs; j++){
+				if(test_intent[j] == negative_intent[j]){
+					negative_freqs[j]+= num_matches * weights[num_matches];
+				}
+			}
+		}
+
+		// cumulates positive and negative significance
+		double positive_significance = 0;
+		double negative_significance = 0;
+		for(int j = 0; j < num_attrs; j++){
+			positive_significance += positive_freqs[j] * positive_freqs[j] / ((positive_len + 1.0) * (positive_len + 1.0));
+			negative_significance += negative_freqs[j] * negative_freqs[j] / ((negative_len + 1.0) * (negative_len + 1.0));
+		}
+		positive_significance = sqrt(positive_significance);
+		negative_significance = sqrt(negative_significance);
+
+		if(positive_significance > negative_significance){
+			is_negative = false;
+		} else {
+			is_positive = false;
+		}
+
+		// checks whether testing sample leads to contrudiction
 		if((is_positive && is_negative) || (!is_positive && !is_negative)){
 			is_undefined = true;
 		}
