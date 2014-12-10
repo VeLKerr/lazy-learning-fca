@@ -56,3 +56,15 @@ min conf= 0.75
  Specificity=TN/(FP+TN)= 0.8666666666666667 
  F1=2*TP/(2*TP+FP+FN)= 0.7703180212014135 
  NPV=TN/(TN+FN)= 0.17105263157894737
+
+with cross:
+min conf= 0.75 
+
+ Средние значения
+
+ accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.770207570208 
+ Precision=TP/(TP+FP)= 0.785240557533 
+ Sensitivity=TN/(TN+FN)= 0.96146864051 
+ Specificity=TN/(FP+TN)= 0.159664976975 
+ F1=2*TP/(2*TP+FP+FN)= 0.864202838209 
+ NPV=TN/(TN+FN)= 0.57185980686
