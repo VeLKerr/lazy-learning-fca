@@ -88,7 +88,7 @@ def check_hypothesis(context_plus, context_minus, example):
                 labels[1]+=1
             if conf_minus>=min_conf:
                 labels[0]+=1
-    if (labels[0]>labels[1]):
+    if (labels[0]>=labels[1]): #различие между rule 1.1 и rule 1.2
         labels['class']=0
     else:
         if (labels[1]>=labels[0]):
@@ -124,13 +124,13 @@ FP=cv_res['0_1']
 FN=cv_res['1_0']
 accuracy=(TP+TN)/(TP+TN+FP+FN)
 precision=TP/(TP+FP)
-sensitivity=TN/(TN+FN)
+sensitivity=TP/(TP+FN)
 specificity=TN/(FP+TN)
 F1=2*TP/(2*TP+FP+FN)
 NPV=TN/(TN+FN)
 print(' accuracy=(TP+TN)/(TP+TN+FP+FN)=',accuracy,'\n',
       'Precision=TP/(TP+FP)=',precision,'\n',
-      'Sensitivity=TN/(TN+FN)=',sensitivity,'\n',
+      'Sensitivity=TP/(TP+FN)=',sensitivity,'\n',
       'Specificity=TN/(FP+TN)=',specificity,'\n',
       'F1=2*TP/(2*TP+FP+FN)=',F1,'\n',
       'NPV=TN/(TN+FN)=',NPV)
