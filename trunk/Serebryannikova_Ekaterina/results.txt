@@ -4,22 +4,30 @@
 1.1.#'+'>#'-' then '+' else '-'
 1.2.#'+'>=#'-' then '+' else '-'	
 	1.1. min_conf=0.88
-		{'1_0': 24, '0_0': 9, '0_1': 6, '1_1': 148}
-		0.83957219251336
-		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.839572192513369 
+		{'contradictory': 0, '0_1': 6, '1_1': 148, '0_0': 9, '1_0': 24}
+ 		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.839572192513369 
  		Precision=TP/(TP+FP)= 0.961038961038961 
- 		Sensitivity=TN/(TN+FN)= 0.2727272727272727 
+ 		Sensitivity=TP/(TP+FN)= 0.8604651162790697 
  		Specificity=TN/(FP+TN)= 0.6 
  		F1=2*TP/(2*TP+FP+FN)= 0.9079754601226994 
  		NPV=TN/(TN+FN)= 0.2727272727272727
 	1.2. min_conf=0.88
-		{'0_1': 6, '1_1': 155, '0_0': 9, '1_0': 17}
- 		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.8770053475935828 
-		Precision=TP/(TP+FP)= 0.9627329192546584 
- 		Sensitivity=TN/(TN+FN)= 0.34615384615384615 
-		Specificity=TN/(FP+TN)= 0.6 
+		{'1_0': 17, '1_1': 155, '0_0': 9, '0_1': 6, 'contradictory': 0}
+		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.8770053475935828 
+ 		Precision=TP/(TP+FP)= 0.9627329192546584 
+ 		Sensitivity=TP/(TP+FN)= 0.9011627906976745 
+ 		Specificity=TN/(FP+TN)= 0.6 
  		F1=2*TP/(2*TP+FP+FN)= 0.9309309309309309 
- 		NPV=TN/(TN+FN)= 0.34615384615384615
+	 	NPV=TN/(TN+FN)= 0.34615384615384615
+	С кроссвалидацией:
+		min conf= 0.88 
+ 		Средние значения
+		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.872873931624 
+ 		Precision=TP/(TP+FP)= 0.892316644805 
+ 		Sensitivity=TN/(TN+FN)= 0.961916530099 
+ 		Specificity=TN/(FP+TN)= 0.457957132985 
+	 	F1=2*TP/(2*TP+FP+FN)= 0.92567983504 
+ 		NPV=TN/(TN+FN)= 0.717264464122
 
 
 2.rule 2:
