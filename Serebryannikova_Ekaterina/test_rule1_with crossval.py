@@ -26,15 +26,9 @@ unknown = [a.strip().split(",") for a in w]
 w.close()
 
 
-min_conf=0.88
+min_conf=0.7
 
-cv_res = {
- "1_1": 0,
- "1_0": 0,
- "0_1": 0,
- "0_0": 0,
- "contradictory": 0,
-}
+
 
 attrib_names = [
 'OVERALL',
@@ -91,7 +85,7 @@ def check_hypothesis(context_plus, context_minus, example):
                 labels[1]+=1
             if conf_minus>=min_conf:
                 labels[0]+=1
-    if (labels[0]>=labels[1]): #различие между rule 1.1 и rule 1.2
+    if (labels[0]>labels[1]): #различие между rule 1.1 и rule 1.2
         labels['class']=0
     else:
         if (labels[1]>=labels[0]):
@@ -121,13 +115,19 @@ lenFull=len(full)
 lenUnc=math.trunc(0.1*lenFull)
 print('lenFull=',len(full))
 print('lenUnk=',lenUnc)
-accuracy=[]
-precision=[]
-sensitivity=[]
-specificity=[]
-F1=[]
-NPV=[]
+TP=[]
+TN=[]
+FP=[]
+FN=[]
+
 for t in range(10):
+    cv_res = {
+     "1_1": 0,
+     "1_0": 0,
+     "0_1": 0,
+     "0_0": 0,
+     "contradictory": 0,
+    }
     train=full.copy()
     randPos=[]
     unknown=[]
@@ -147,29 +147,40 @@ for t in range(10):
         check_hypothesis(plus, minus, elem)
     #    if i == 3: break
     print (cv_res)
-    TP=cv_res['1_1']
-    TN=cv_res['0_0']
-    FP=cv_res['0_1']
-    FN=cv_res['1_0']
-    accuracy.append((TP+TN)/(TP+TN+FP+FN))
-    precision.append(TP/(TP+FP))
-    sensitivity.append(TP/(TP+FN))
-    specificity.append(TN/(FP+TN))
-    F1.append(2*TP/(2*TP+FP+FN))
-    NPV.append(TN/(TN+FN))
+    TP.append(cv_res['1_1'])
+    TN.append(cv_res['0_0'])
+    FP.append(cv_res['0_1'])
+    FN.append(cv_res['1_0'])
+    '''accuracy=((TP[-1]+TN[-1])/(TP[-1]+TN[-1]+FP[-1]+FN[-1]))
+    precision=(TP[-1]/(TP[-1]+FP[-1]))
+    sensitivity=(TP[-1]/(TP[-1]+FN[-1]))
+    specificity=(TN[-1]/(FP[-1]+TN[-1]))
+    F1=(2*TP[-1]/(2*TP[-1]+FP[-1]+FN[-1]))
+    NPV=(TN[-1]/(TN[-1]+FN[-1]))
     print('min conf=',min_conf,'\n',
-          't=',t,
-          'accuracy=(TP+TN)/(TP+TN+FP+FN)=',accuracy[-1],'\n',
-          'Precision=TP/(TP+FP)=',precision[-1],'\n',
-          'Sensitivity=TN/(TN+FN)=',sensitivity[-1],'\n',
-          'Specificity=TN/(FP+TN)=',specificity[-1],'\n',
-          'F1=2*TP/(2*TP+FP+FN)=',F1[-1],'\n',
-          'NPV=TN/(TN+FN)=',NPV[-1])
+          't=',t,'\n',
+          'accuracy=(TP+TN)/(TP+TN+FP+FN)=',accuracy,'\n',
+          'Precision=TP/(TP+FP)=',precision,'\n',
+          'Sensitivity=TN/(TN+FN)=',sensitivity,'\n',
+          'Specificity=TN/(FP+TN)=',specificity,'\n',
+          'F1=2*TP/(2*TP+FP+FN)=',F1,'\n',
+          'NPV=TN/(TN+FN)=',NPV)'''
+tp=numpy.mean(TP)
+tn=numpy.mean(TN)
+fp=numpy.mean(FP)
+fn=numpy.mean(FN)
+accuracy=((tp+tn)/(tp+tn+fp+fn))
+precision=(tp/(tp+fp))
+sensitivity=(tp/(tp+fn))
+specificity=(tn/(fp+tn))
+F1=(2*tp/(2*tp+fp+fn))
+NPV=(tn/(tn+fn))
 print('min conf=',min_conf,'\n',
-          'Средние значения'
-          'accuracy=(TP+TN)/(TP+TN+FP+FN)=',numpy.mean(accuracy),'\n',
-          'Precision=TP/(TP+FP)=',numpy.mean(precision),'\n',
-          'Sensitivity=TN/(TN+FN)=',numpy.mean(sensitivity),'\n',
-          'Specificity=TN/(FP+TN)=',numpy.mean(specificity),'\n',
-          'F1=2*TP/(2*TP+FP+FN)=',numpy.mean(F1),'\n',
-          'NPV=TN/(TN+FN)=',numpy.mean(NPV))
+      'TP=',tp,'TN=',tn,'FP=',fp,'FN=',fn,'\n',
+          'Средние значения','\n',
+          'accuracy=(TP+TN)/(TP+TN+FP+FN)=',accuracy,'\n',
+          'Precision=TP/(TP+FP)=',precision,'\n',
+          'Sensitivity=TN/(TN+FN)=',sensitivity,'\n',
+          'Specificity=TN/(FP+TN)=',specificity,'\n',
+          'F1=2*TP/(2*TP+FP+FN)=',F1,'\n',
+          'NPV=TN/(TN+FN)=',NPV)
