@@ -19,9 +19,9 @@
  		Specificity=TN/(FP+TN)= 0.6 
  		F1=2*TP/(2*TP+FP+FN)= 0.9309309309309309 
 	 	NPV=TN/(TN+FN)= 0.34615384615384615
-	С кроссвалидацией:
+	With cross validation:
 		min conf= 0.88 
- 		Средние значения
+ 		Mean values
 		accuracy=(TP+TN)/(TP+TN+FP+FN)= 0.872873931624 
  		Precision=TP/(TP+FP)= 0.892316644805 
  		Sensitivity=TN/(TN+FN)= 0.961916530099 
@@ -31,13 +31,13 @@
 
 
 2.rule 2:
-сумма достоверностей
+sum of confidences
 {'0_1': 15, 'contradictory': 0, '1_0': 0, '0_0': 0, '1_1': 172}
 0.9197860962566845
-!!!Ни одного нуля!!!
+!!!No null!!!
 
 3.rule 3:
-сумма достоверностей, но прибавляем достоверность только если она больше порога min_conf
+sum of confidence, but when conf>threshold
 if conf_plus[i]>min_conf -> conf_plus+=conf_plus[i] 
 
 {'1_1': 119, '0_1': 3, '0_0': 12, '1_0': 53}
