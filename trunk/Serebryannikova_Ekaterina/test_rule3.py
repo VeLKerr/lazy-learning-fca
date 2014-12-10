@@ -19,6 +19,7 @@ minus = [a for a in train if a[0]=="0"]
 q.close()
 w=open("test.txt","r")
 unknown = [a.strip().split(",") for a in w]
+print(len(unknown))
 w.close()
 
 min_conf=0.75
@@ -125,14 +126,13 @@ FP=cv_res['0_1']
 FN=cv_res['1_0']
 accuracy=(TP+TN)/(TP+TN+FP+FN)
 precision=TP/(TP+FP)
-sensitivity=TN/(TN+FN)
+sensitivity=TP/(TP+FN)
 specificity=TN/(FP+TN)
 F1=2*TP/(2*TP+FP+FN)
 NPV=TN/(TN+FN)
-print('min conf=',min_conf,'\n',
-      'accuracy=(TP+TN)/(TP+TN+FP+FN)=',accuracy,'\n',
+print(' accuracy=(TP+TN)/(TP+TN+FP+FN)=',accuracy,'\n',
       'Precision=TP/(TP+FP)=',precision,'\n',
-      'Sensitivity=TN/(TN+FN)=',sensitivity,'\n',
+      'Sensitivity=TP/(TP+FN)=',sensitivity,'\n',
       'Specificity=TN/(FP+TN)=',specificity,'\n',
       'F1=2*TP/(2*TP+FP+FN)=',F1,'\n',
       'NPV=TN/(TN+FN)=',NPV)
