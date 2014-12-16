@@ -1,0 +1,11 @@
+HammingDistanceLazyAlgorithm HammDistWeightedAlgorithm HypothesisTestingAlgorithm HypothesisTestingWeightedAlgorithm 
+	Rate
+0.571654	0.928736	0.672043	0.960994	
+	True Positive Rate
+0.690753	0.939785	1	0.972043	
+	False Positive Rate
+0.137734	0.0110493	0.333333	0.0110493	
+	True Negative Rate
+0.862266	0.988951	0.666667	0.988951	
+	False Negative Rate
+0.309247	0.0602151	0	0.027957	
