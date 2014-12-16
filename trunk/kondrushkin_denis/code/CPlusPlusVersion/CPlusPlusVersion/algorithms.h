@@ -60,3 +60,12 @@ public:
 };
 
 
+class HypothesisTestingWeightedAlgorithm : public Algorithm {
+
+public:
+	HypothesisTestingWeightedAlgorithm();
+	HypothesisTestingWeightedAlgorithm(const Context* context, const Data* test_data);
+	void classify(std::vector<char*>& res) const;
+};
+
+

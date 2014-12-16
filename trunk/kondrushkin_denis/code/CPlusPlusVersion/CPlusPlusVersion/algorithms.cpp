@@ -290,6 +290,76 @@ HypothesisTestingAlgorithm::HypothesisTestingAlgorithm(const Context* context, c
 
 void HypothesisTestingAlgorithm::classify(std::vector<char*>& res) const{
 
+	const int n = _test_data->len();
+	for(int  i = 0; i < n; i++){
+		bool is_positive = true;
+		bool is_negative = true;
+		bool is_undefined = false;
+
+		// cumulates positive and negative significance
+		double positive_significance = 0;
+		double negative_significance = 0;
+
+		// gets current sample's intent
+		const char* test_intent = _test_data->at(i);
+
+		// takes into account support from samples
+		bool context_types[] = {true, false};
+		for each(bool positive in context_types){
+
+			int len = positive ? _context->positive_len() : _context->negative_len();
+			for(int intent_index = 0; intent_index < len; intent_index++){
+
+				const char* intersect = positive ?
+					_context->positive_intersect(intent_index, test_intent) :
+					_context->negative_intersect(intent_index, test_intent);
+
+				double positive_support = _context->positive_support(intersect);
+				double negative_support = _context->negative_support(intersect);	
+
+				if(positive){
+					positive_significance += positive_support * _context->len() / _context->positive_len();
+				} else {
+					negative_significance += negative_support * _context->len() / _context->negative_len();
+				}
+
+				delete[] intersect;
+			}
+		}
+
+		if(positive_significance > negative_significance){
+			is_negative = false;
+		} else {
+			is_positive = false;
+		}
+
+		// checks whether testing sample leads to contrudiction
+		if((is_positive && is_negative) || (!is_positive && !is_negative)){
+			is_undefined = true;
+		}
+
+		// sets answer for giving sample
+		char *ch = new char[2];
+		ch[1] = '\0';
+		if(is_undefined){
+			ch[0] = UNDEFINED_CHAR;
+		}else{
+			ch[0] = is_positive ? POSITIVE_CHAR : NEGATIVE_CHAR;
+		}
+		res.push_back(ch);
+	}
+}
+
+
+//************************************** HypothesisTestingWeightedAlgorithm Class **************************************/
+
+HypothesisTestingWeightedAlgorithm::HypothesisTestingWeightedAlgorithm(){}
+
+HypothesisTestingWeightedAlgorithm::HypothesisTestingWeightedAlgorithm(const Context* context, const Data* test_data)
+	:Algorithm(context, test_data){}
+
+void HypothesisTestingWeightedAlgorithm::classify(std::vector<char*>& res) const{
+
 	// gets number of attributes in given data
 	const int num_attrs = _test_data->get_num_attrs();	
 
@@ -299,18 +369,15 @@ void HypothesisTestingAlgorithm::classify(std::vector<char*>& res) const{
 		if(i < 1){
 			weights[i] = 0;
 		} else {
-			weights[i] =  pow((double)i, 5);
+			weights[i] =  pow((double)i, 45);
 		}
 	}
-
+	
 	const int n = _test_data->len();
 	for(int  i = 0; i < n; i++){
 		bool is_positive = true;
 		bool is_negative = true;
 		bool is_undefined = false;
-
-		const int positive_len = _context->positive_len();
-		const int negative_len = _context->negative_len();
 
 		// cumulates positive and negative significance
 		double positive_significance = 0;
@@ -319,42 +386,35 @@ void HypothesisTestingAlgorithm::classify(std::vector<char*>& res) const{
 		// gets current sample's intent
 		const char* test_intent = _test_data->at(i);
 
-		// takes into account support from positive samples
-		for(int positive_intent_index = 0; positive_intent_index < positive_len; positive_intent_index++){
-			const char* intersect = _context->positive_intersect(positive_intent_index, test_intent);			
-			int num_matches = (int)strlen(intersect);
+		// takes into account support from samples
+		bool context_types[] = {true, false};
+		for each(bool positive in context_types){
 
-			double positive_support = _context->positive_support(intersect);
-			double negative_support = _context->negative_support(intersect);
+			int len = positive ? _context->positive_len() : _context->negative_len();
+			for(int intent_index = 0; intent_index < len; intent_index++){
+
+				const char* intersect = positive ?
+					_context->positive_intersect(intent_index, test_intent) :
+					_context->negative_intersect(intent_index, test_intent);
+
+				int num_matches = 0;
+				for(int j = 0; j < num_attrs; j++){
+					if(intersect[j] != MISS_CHAR){
+						num_matches++;
+					}
+				}
+				
+				double positive_support = _context->positive_support(intersect);
+				double negative_support = _context->negative_support(intersect);
 			
-			positive_support *= _context->len();
-			positive_support /= _context->positive_len();
+				if(positive){
+					positive_significance += weights[num_matches] * positive_support * _context->len() / _context->positive_len();;
+				} else {
+					negative_significance += weights[num_matches] * negative_support * _context->len() / _context->negative_len();;			
+				}
 
-			negative_support *= _context->positive_len();
-			negative_support /= _context->negative_len();			
-
-			positive_significance += positive_support * (1 - negative_support) * weights[num_matches];
-
-			delete[] intersect;
-		}
-
-		// takes into account support from negative samples
-		for(int negative_intent_index = 0; negative_intent_index < negative_len; negative_intent_index++){
-			const char* intersect = _context->negative_intersect(negative_intent_index, test_intent);
-			int num_matches = (int)strlen(intersect);
-
-			double positive_support = _context->positive_support(intersect); 
-			double negative_support = _context->negative_support(intersect);
-			
-			positive_support *= _context->len();
-			positive_support /= _context->positive_len();
-
-			negative_support *= _context->positive_len();
-			negative_support /= _context->negative_len();			
-
-			negative_significance += negative_support * (1 - positive_support) * weights[num_matches];			
-
-			delete[] intersect;
+				delete[] intersect;
+			}
 		}
 
 		if(positive_significance > negative_significance){

@@ -98,16 +98,25 @@ void CrossValidator::validate(const char* path, const std::vector<Algorithm*>& a
 	for each(Algorithm* alg in algorithms){
 		ofile << typeid(*alg).name() + strlen("class ") << ' ';
 	}
-	ofile << std::endl;
 
 	// sets initial rates for each algorithm
 	std::vector<double> total_rates = std::vector<double>();
+	std::vector<double> total_true_positive_rates = std::vector<double>();
+	std::vector<double> total_false_positive_rates = std::vector<double>();
+	std::vector<double> total_true_negative_rates = std::vector<double>();
+	std::vector<double> total_false_negative_rates = std::vector<double>();
 	for each(Algorithm* alg in algorithms){
 		total_rates.push_back(0);
+		total_true_positive_rates.push_back(0);
+		total_false_positive_rates.push_back(0);
+		total_true_negative_rates.push_back(0);
+		total_false_negative_rates.push_back(0);
 	}
 
 	// processes k-fold validation
 	for(int i = 0; i < _k; i++){
+		std::cout << std::endl << ((double) 100 * i) / _k << "% completed"; 
+
 		std::vector<char*> res;
 
 		// validates each algorithm
@@ -115,25 +124,69 @@ void CrossValidator::validate(const char* path, const std::vector<Algorithm*>& a
 			algorithms[j]->set(_contexts.at(i), _tests.at(i));
 			algorithms[j]->classify(res);
 
+			// rate counters
 			double rate = 0;
+			double tp_rate = 0;
+			double fp_rate = 0;
+			double tn_rate = 0;
+			double fn_rate = 0;
+
 			for(int t = 0; t < _tests.at(i)->len(); t++){
 				if(strcmp(res.at(t), _tests.at(i)->answer_at(t)) == 0){
 					rate++;
+					if(res.at(t)[0] == POSITIVE_CHAR){
+						tp_rate++;
+					} else if(res.at(t)[0] == NEGATIVE_CHAR){
+						tn_rate++;
+					}
+				} else {
+					if(res.at(t)[0] == POSITIVE_CHAR){
+						fp_rate++;
+					} else if(res.at(t)[0] == NEGATIVE_CHAR){
+						fn_rate++;
+					}
 				}
 			}
-			rate /= _tests.at(i)->len();
-			total_rates[j] += rate;
 
-			ofile << rate << '\t';
+			rate /= _tests.at(i)->len();
+			double tp = (tp_rate + fn_rate != 0) ? tp_rate / (tp_rate + fn_rate) : 1;
+			double fp = (tn_rate + fp_rate != 0) ? fp_rate / (tn_rate + fp_rate) : 0;
+			double tn = (tn_rate + fp_rate != 0) ? tn_rate / (tn_rate + fp_rate) : 1;
+			double fn = (tp_rate + fn_rate != 0) ? fn_rate / (tp_rate + fn_rate) : 0;
+
+			total_rates[j] += rate;
+			total_true_positive_rates[j] += tp;
+			total_false_positive_rates[j] += fp;
+			total_true_negative_rates[j] += tn;
+			total_false_negative_rates[j] += fn;
+
 			res.clear();
 		}
-
-		ofile << std::endl;
 	}
 
 	// prints average rate for each algorithm
-	ofile << std::endl;
+	ofile << std::endl << "\tRate" << std::endl;
 	for each(double rate in total_rates){
+		ofile << rate / _k << '\t';
+	}
+
+	ofile << std::endl << "\tTrue Positive Rate" << std::endl;
+	for each(double rate in total_true_positive_rates){
+		ofile << rate / _k << '\t';
+	}
+
+	ofile << std::endl << "\tFalse Positive Rate" << std::endl;
+	for each(double rate in total_false_positive_rates){
+		ofile << rate / _k << '\t';
+	}
+
+	ofile << std::endl << "\tTrue Negative Rate" << std::endl;
+	for each(double rate in total_true_negative_rates){
+		ofile << rate / _k << '\t';
+	}
+
+	ofile << std::endl << "\tFalse Negative Rate" << std::endl;
+	for each(double rate in total_false_negative_rates){
 		ofile << rate / _k << '\t';
 	}
 

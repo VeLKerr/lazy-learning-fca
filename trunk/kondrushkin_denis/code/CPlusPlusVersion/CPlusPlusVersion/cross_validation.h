@@ -1,13 +1,12 @@
 #pragma once
 
-
 #include <vector>
 #include <fstream>
+#include <cmath>
 #include "data.h"
 #include "context.h"
 #include "defines.h"
 #include "algorithms.h"
-
 
 class CrossValidator {
 

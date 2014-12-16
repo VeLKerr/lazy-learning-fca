@@ -98,13 +98,18 @@ int Context::score(bool positive, const char* intent) const{
 	for(int i = 0; i < n; i++){
 		score += check_inclusion(positive, i, intent) ? 1 : 0;
 	}
-
 	return score;
 }
 
 double Context::support(bool positive, const char* intent) const{
-	double n = len(positive);
+	double n = len();
 	return score(positive, intent) / n;
+}
+
+double Context::confidence(bool positive, const char* intent) const{
+	double pos_score = score(true, intent);
+	double neg_score = score(false, intent);
+	return (positive ? pos_score : neg_score) / (pos_score + neg_score);
 }
 
 
@@ -174,4 +179,12 @@ double Context::positive_support(const char* intent) const{
 
 double Context::negative_support(const char* intent) const{
 	return support(false, intent);
+}
+
+double Context::positive_confidence(const char* intent) const{
+	return confidence(true, intent);
+}
+
+double Context::negative_confidence(const char* intent) const{
+	return confidence(false, intent);
 }

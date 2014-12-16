@@ -27,7 +27,7 @@ private:
 
 	int score(bool positive, const char* intent) const;
 	double support(bool positive, const char* intent) const;
-
+	double confidence(bool positive, const char* intent) const;
 
 public:
 	int get_num_attrs() const;
@@ -53,4 +53,7 @@ public:
 
 	double positive_support(const char* intent) const;
 	double negative_support(const char* intent) const;
+
+	double positive_confidence(const char* intent) const;
+	double negative_confidence(const char* intent) const;
 };
