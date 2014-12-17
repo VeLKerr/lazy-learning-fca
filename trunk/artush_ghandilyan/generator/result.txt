@@ -1,0 +1,36 @@
+test_generator_1:
+{'positive_negative': 112, 'negative_positive': 0, 'negative_negative': 15, 'positive_positive': 60, 'contradictory': 0}
+
+test_generator_2:
+{'positive_negative': 106, 'negative_positive': 0, 'negative_negative': 15, 'positive_positive': 66, 'contradictory': 0}
+
+test_generator_3:
+{'positive_negative': 18, 'negative_positive': 15, 'negative_negative': 0, 'positive_positive': 154, 'contradictory': 0}
+Accuracy = 0.8235294117647058,
+Precision = 0.9112426035502958,
+Sensitivity = 0.8953488372093024,
+Specificity = 0.0,
+F1 score = 0.9032258064516129,
+NPV = 0
+
+test_generator_4:
+{'positive_negative': 29, 'negative_positive': 7, 'negative_negative': 8, 'positive_positive': 143, 'contradictory': 0}
+Accuracy = 0.807486631016
+Precision = 0.953333333333 
+Sensitivity = 0.831395348837 
+Specificity =  0.533333333333 
+F1 score = 0.888198757764 
+NPV = 0.216216216216
+
+
+test_implication_1:
+{'positive_negative': 0, 'negative_positive': 0, 'negative_negative': 15, 'positive_positive': 172, 'contradictory': 0}
+Accuracy = 1.0
+Precision = 1.0
+Sensitivity = 1.0
+Specificity = 1.0
+F1 score = 1.0
+NPV = 1.0
+
+
+
