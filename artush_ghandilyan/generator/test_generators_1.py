@@ -80,8 +80,8 @@ def check_hypothesis(context_plus, context_minus, example):
                 labels[cs+'_res'] = candidate_intent
                 labels[cs+'_total_weight'] = \
                     labels.get(cs+'_total_weight', 0) + closure_size * 1.0 / len(context_plus) / len(context_minus)
-    print eintent
-    print labels
+    # print eintent
+    # print labels
     if labels.get("1", False) and labels.get("0", False) and labels.get("1_total_weight", 0) == labels.get("0_total_weight", 0):
        cv_res["contradictory"] += 1
        return
@@ -101,7 +101,7 @@ def check_hypothesis(context_plus, context_minus, example):
 #check_hypothesis(plus_examples, minus_examples, plus_examples[3])
 i = 0
 for elem in unknown:
-    print "done"
+    print "done: " + str(i)
     i += 1
     check_hypothesis(plus, minus, elem)
 
