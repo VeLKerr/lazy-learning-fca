@@ -23,7 +23,7 @@ F1 score = 0.888198757764
 NPV = 0.216216216216
 
 
-test_implication_1:
+test_implication_1: ****NOT CORRECT
 {'positive_negative': 0, 'negative_positive': 0, 'negative_negative': 15, 'positive_positive': 172, 'contradictory': 0}
 Accuracy = 1.0
 Precision = 1.0
@@ -33,4 +33,11 @@ F1 score = 1.0
 NPV = 1.0
 
 
-
+test_implication_1:
+{'positive_negative': 25, 'negative_positive': 0, 'negative_negative': 15, 'positive_positive': 147, 'contradictory': 0}
+Accuracy = 0.866310160428
+Precision = 1.0
+Sensitivity = 0.854651162791
+Specificity = 1.0
+F1 score = 0.921630094044
+NPV = 0.375
