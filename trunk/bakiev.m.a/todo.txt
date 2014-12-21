@@ -1,6 +1,0 @@
-creating sets for cross-validation
-
-sys.argv[1]
-
-loop over all sets
-
