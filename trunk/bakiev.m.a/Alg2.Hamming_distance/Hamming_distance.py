@@ -45,29 +45,27 @@ def check_hypothesis(context_plus, context_minus, example):
     eintent.discard('class:negative')
     global cv_res
 
-    plus_counter = 0
+    hdistance_plus = 0
     for e in context_plus:
         ei = make_intent(e)
-        if len(eintent & ei) >= len(eintent) - 2:
-            plus_counter += 1
+        hdistance_plus += len(eintent) - len(eintent & ei)
+    av_hdistance_plus = hdistance_plus/len(context_plus)
 
-    minus_counter = 0
+    hdistance_minus = 0
     for e in context_minus:
         ei = make_intent(e)
-        if len(eintent & ei) >= len(eintent) - 2:
-            minus_counter += 1
+        hdistance_minus += len(eintent) - len(eintent & ei)
+    av_hdistance_minus = hdistance_minus/len(context_minus)
 
-    if plus_counter == 0 and minus_counter == 0:
-        cv_res["not_classified"] += 1
+    if av_hdistance_minus == av_hdistance_plus:
+        cv_res["contradictory"] += 1
     else:
-        if plus_counter/len(context_plus) > minus_counter/len(context_minus):
+        if av_hdistance_plus < av_hdistance_minus:
             predicted_class = "positive"
             if predicted_class == example[-1]:
                 cv_res["positive_positive"] += 1
             else:
                 cv_res["negative_positive"] += 1
-        elif plus_counter/len(context_plus) == minus_counter/len(context_minus):
-            cv_res["contradictory"] += 1
         else:
             predicted_class = "negative"
             if predicted_class == example[-1]:
