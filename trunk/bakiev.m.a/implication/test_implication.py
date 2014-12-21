@@ -1,7 +1,8 @@
 import pprint
 import sys
 
-index = sys.argv[1]
+#index = sys.argv[1]
+index = 1
 
 q=open("train"+index+".csv","r")
 train = [ a.strip().split(",") for a in q]
@@ -96,7 +97,7 @@ def check_hypothesis(context_plus, context_minus, example):
 
 for elem in unknown:
 #    print elem
-    print "done"
+    print("done")
     check_hypothesis(plus, minus, elem)
 
-print cv_res
+print(cv_res)

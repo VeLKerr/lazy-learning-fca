@@ -1,10 +1,15 @@
 import pprint
 import sys
+from functools import reduce
 
 index = sys.argv[1]
+#index = '1'
 
 q=open("train"+index+".csv","r")
-train = [ a.strip().split(",") for a in q]
+train = [ a.strip().split(",") for a in q] #iteration over lines?
+
+print(train)
+
 plus = [a for a in train if a[-1]=="positive"]
 minus = [a for a in train if a[-1]=="negative"]
 
@@ -43,14 +48,16 @@ def make_intent(example):
     return set([i+':'+str(k) for i,k in zip(attrib_names,example)])
     
 def check_hypothesis(context_plus, context_minus, example):
-  #  print example
+  #  print(example)
     eintent = make_intent(example)
-  #  print eintent
+  #  print(eintent)
     eintent.discard('class:positive')
     eintent.discard('class:negative')
     labels = {}
     global cv_res
+    count = 0
     for e in context_plus:
+        count += 1
         ei = make_intent(e)
         candidate_intent = ei & eintent
         closure = [ make_intent(i) for i in context_minus if make_intent(i).issuperset(candidate_intent)]
@@ -63,6 +70,7 @@ def check_hypothesis(context_plus, context_minus, example):
                 labels[cs] = True
                 labels[cs+'_res'] = candidate_intent
                 labels[cs+'_total_weight'] = labels.get(cs+'_total_weight',0) +closure_size * 1.0 / len(context_minus) / len(context_plus)
+    print(count)
     for e in context_minus:
         ei = make_intent(e)
         candidate_intent = ei & eintent
@@ -75,8 +83,8 @@ def check_hypothesis(context_plus, context_minus, example):
                 labels[cs] = True
                 labels[cs+'_res'] = candidate_intent
                 labels[cs+'_total_weight'] = labels.get(cs+'_total_weight',0) +closure_size * 1.0 / len(context_plus) / len(context_minus)
-    print eintent
-    print labels
+    print(eintent)
+    print(labels)
     if labels.get("positive",False) and labels.get("negative",False):
        cv_res["contradictory"] += 1
        return
@@ -92,10 +100,12 @@ def check_hypothesis(context_plus, context_minus, example):
 #sanity check:
 #check_hypothesis(plus_examples, minus_examples, plus_examples[3])
 i = 0
-for elem in unknown:
+unknown.pop(0)
+for elem in unknown: #zeroth element is names of variables and it is removed
     #print elem
-    print "done"
+    print("done")
     i += 1
     check_hypothesis(plus, minus, elem)
-#    if i == 3: break
-print cv_res
+    if i == 10: break
+
+print(cv_res)
