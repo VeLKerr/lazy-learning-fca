@@ -1,5 +1,5 @@
-k=1-10
-
+k=1-10 - хорошо рботает
+k=15 и выше - ухудшение
 [{'contradictory': 0,
   'negative_negative': 32,
   'negative_positive': 0,
