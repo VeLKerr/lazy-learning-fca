@@ -1,3 +1,4 @@
+import pprint
 
 #k nearest neighbors method....
 
@@ -124,28 +125,30 @@ def check_hypothesis(context_plus, context_minus, example,k):
             else:
                 cv_res["positive_negative"] += 1
 
-def statistics(results,count):
+def statistics(results):
+    count = len(results)
     res={}
-    res["positive_positive"] = 0
-    res["positive_negative"] = 0
-    res["negative_positive"] = 0
-    res["negative_negative"] = 0
-    res["contradictory"] = 0
-    res["not_classified"] = 0
+
+    res['Sensitivity (TPR) of the procedure is ']           = 0
+    res['Fall-out (FPR) of the procedure is ']              = 0
+    res['Precision (PPV) of the procedure is ']             = 0
+    res['False omission rate (FOR) of the procedure is ']   = 0
+    res['Accuracy of the procedure is ']                    = 0
+
     for element in results:
-        res["positive_positive"] += element["positive_positive"]
-        res["positive_negative"] += element["positive_negative"]
-        res["negative_positive"] += element["negative_positive"]
-        res["negative_negative"] += element["negative_negative"]
-        res["contradictory"] += element["contradictory"]
-        res["not_classified"] += element["not_classified"]
+
+        res['Sensitivity (TPR) of the procedure is ']           += element['positive_positive']/(element['positive_positive'] + element['positive_negative'])
+        res['Fall-out (FPR) of the procedure is ']              += element['negative_positive']/(element['negative_negative'] + element['negative_positive'])
+        res['Precision (PPV) of the procedure is ']             += element['positive_positive']/(element['positive_positive'] + element['negative_positive'])
+        res['False omission rate (FOR) of the procedure is ']   += element['positive_negative']/(element['positive_negative'] + element['negative_negative'])
+        res['Accuracy of the procedure is ']                    += (element['positive_positive'] + element['negative_negative'])/(element['positive_positive'] + element['positive_negative'] + element['negative_positive'] + element['negative_negative'])
 
     resPercentage={}
 
     for key in res:
         resPercentage[key] = str(round(res[key]*100/count,2))+'%'
 
-    return resPercentage,res
+    return resPercentage
 
 results = []
 
@@ -154,7 +157,7 @@ results = []
 
 k=4
 
-allUncnown = 0
+
 for index in range(1,11):
     q=open("data/train"+str(index)+".csv","r")
     train = [ a.strip().split(",") for a in q]
@@ -165,22 +168,11 @@ for index in range(1,11):
     w=open("data/test"+str(index)+".csv","r")
     unknown = [a.strip().split(",") for a in w]
 
-    allUncnown += len(unknown)
     w.close()
     unknown.pop(0)
     results.append(classification(plus, minus, unknown,k))
 
-stats = statistics(results,allUncnown)
-print(stats[0])
+stats = statistics(results)
 
-stats=stats[1]
+pprint.pprint(stats)
 
-print(stats)
-
-print("min distances=",min(allDistances))
-
-print('Sensitivity (TPR) of the procedure is ' + str(round(stats['positive_positive']/(stats['positive_positive'] + stats['positive_negative'])*100,2)) + '%')
-print('Fall-out (FPR) of the procedure is ' + str(round(stats['negative_positive']/(stats['negative_negative'] + stats['negative_positive'])*100,2)) + '%')
-print('Precision (PPV) of the procedure is ' + str(round(stats['positive_positive']/(stats['positive_positive'] + stats['negative_positive'])*100,2)) + '%')
-print('False omission rate (FOR) of the procedure is ' + str(round(stats['positive_negative']/(stats['positive_negative'] + stats['negative_negative'])*100,2)) + '%')
-print('Accuracy of the procedure is ' + str(round((stats['positive_positive'] + stats['negative_negative'])/(stats['positive_positive'] + stats['positive_negative'] + stats['negative_positive'] + stats['negative_negative'])*100,2)) + '%')
