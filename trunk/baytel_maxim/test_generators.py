@@ -1,19 +1,10 @@
 ﻿
 import pprint
 
-cv_res = {
- "positive_positive": 0,
- "positive_negative": 0,
- "negative_positive": 0,
- "negative_negative": 0,
- "contradictory": 0,
-}
-
-#attrib_names = [ 'class','a1','a2','a3','a4','a5','a6' ]
 attrib_names = [
 'top-left-square',
 'top-middle-square',
-' top-right-square',
+'top-right-square',
 'middle-left-square',
 'middle-middle-square',
 'middle-right-square',
@@ -23,27 +14,18 @@ attrib_names = [
 'class'
 ]
 
-
 def make_intent(example):
     global attrib_names
     return set([i+':'+str(k) for i,k in zip(attrib_names,example)])
 
 
-def classification(context_plus, context_minus, unknown,alpha):
-
-    global cv_res
-    cv_res["positive_positive"] = 0
-    cv_res["positive_negative"] = 0
-    cv_res["negative_positive"] = 0
-    cv_res["negative_negative"] = 0
-    cv_res["contradictory"] = 0
-    cv_res["not_classified"] = 0
+def classification(context_plus, context_minus, unknown,alpha,res):
     for elem in unknown:
-        check_hypothesis(context_plus, context_minus, elem,alpha)
-    return cv_res
+        check_hypothesis(context_plus, context_minus, elem,alpha,res)
+    return res
 
     
-def check_hypothesis(context_plus, context_minus,example,alpha):
+def check_hypothesis(context_plus, context_minus,example,alpha,res):
   #  print example
     eintent = make_intent(example)
   #  print eintent
@@ -53,7 +35,6 @@ def check_hypothesis(context_plus, context_minus,example,alpha):
     posVotes=0
     negVotes=0
 
-    global cv_res
     for e in context_plus:
         ei = make_intent(e)
         candidate_intent = ei & eintent #перечечение ? с объектом положительного контекста
@@ -100,22 +81,22 @@ def check_hypothesis(context_plus, context_minus,example,alpha):
 
     if posVotes == negVotes:
         if posVotes > 0:
-            cv_res["contradictory"] += 1
+            res["contradictory"] += 1
         else:
-            cv_res["not_classified"] += 1
+            res["not_classified"] += 1
     else:
         if negVotes < posVotes:
             predicted_class = "positive"
             if predicted_class == example[-1]:
-                cv_res["positive_positive"] += 1
+                res["positive_positive"] += 1
             else:
-                cv_res["negative_positive"] += 1
+                res["negative_positive"] += 1
         else:
             predicted_class = "negative"
             if predicted_class == example[-1]:
-                cv_res["negative_negative"] += 1
+                res["negative_negative"] += 1
             else:
-                cv_res["positive_negative"] += 1
+                res["positive_negative"] += 1
 
 def statistics(results):
     count = len(results)
@@ -144,9 +125,20 @@ def statistics(results):
 
 results = []
 
-alpha=0.7
+alpha=0.3
 
 for index in range(1,11):
+
+    cv_res = \
+        {
+            "positive_positive": 0,
+            "positive_negative": 0,
+            "negative_positive": 0,
+            "negative_negative": 0,
+            "contradictory": 0,
+            "not_classified": 0,
+    }
+
     q=open("data/train"+str(index)+".csv","r")
     train = [ a.strip().split(",") for a in q]
     plus = [a for a in train if a[-1]=="positive"]
@@ -156,9 +148,11 @@ for index in range(1,11):
     w=open("data/test"+str(index)+".csv","r")
     unknown = [a.strip().split(",") for a in w]
 
+    print('unknown len=',len(unknown))
+
     w.close()
     unknown.pop(0)
-    results.append(classification(plus, minus, unknown,alpha))
+    results.append(classification(plus, minus, unknown,alpha,cv_res))
 
 
 pprint.pprint(results)

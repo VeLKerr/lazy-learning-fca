@@ -2,20 +2,10 @@ import pprint
 
 #k nearest neighbors method....
 
-cv_res = {
- "positive_positive": 0,
- "positive_negative": 0,
- "negative_positive": 0,
- "negative_negative": 0,
- "contradictory": 0,
- "not_classified": 0
-}
-
-#attrib_names = [ 'class','a1','a2','a3','a4','a5','a6' ]
 attrib_names = [
 'top-left-square',
 'top-middle-square',
-' top-right-square',
+'top-right-square',
 'middle-left-square',
 'middle-middle-square',
 'middle-right-square',
@@ -31,27 +21,19 @@ def make_intent(example):
     global attrib_names
     return set([i+':'+str(k) for i,k in zip(attrib_names,example)])
 
-def classification(context_plus, context_minus, unknown,k):
+def classification(context_plus, context_minus, unknown,k,res):
 
     if k > len(context_plus) + len(context_minus):
         raise ValueError('K was chosen wrong')
 
-    global cv_res
-    cv_res["positive_positive"] = 0
-    cv_res["positive_negative"] = 0
-    cv_res["negative_positive"] = 0
-    cv_res["negative_negative"] = 0
-    cv_res["contradictory"] = 0
-    cv_res["not_classified"] = 0
     for elem in unknown:
-        check_hypothesis(context_plus, context_minus, elem,k)
-    return cv_res
+        check_hypothesis(context_plus, context_minus, elem,k,res)
+    return res
 
-def check_hypothesis(context_plus, context_minus, example,k):
+def check_hypothesis(context_plus, context_minus, example,k,res):
     eintent = make_intent(example)
     eintent.discard('class:positive')
     eintent.discard('class:negative')
-    global cv_res
 
     hdistanceListMap=dict()
 
@@ -110,20 +92,20 @@ def check_hypothesis(context_plus, context_minus, example,k):
             break
 
     if posCount == negCount:
-        cv_res["contradictory"] += 1
+        res["contradictory"] += 1
     else:
         if negCount < posCount:
             predicted_class = "positive"
             if predicted_class == example[-1]:
-                cv_res["positive_positive"] += 1
+                res["positive_positive"] += 1
             else:
-                cv_res["negative_positive"] += 1
+                res["negative_positive"] += 1
         else:
             predicted_class = "negative"
             if predicted_class == example[-1]:
-                cv_res["negative_negative"] += 1
+                res["negative_negative"] += 1
             else:
-                cv_res["positive_negative"] += 1
+                res["positive_negative"] += 1
 
 def statistics(results):
     count = len(results)
@@ -155,10 +137,21 @@ results = []
 #удивительно но с небольшими k (где-то до 15) нету ложных срабатываний и меньше процента противоричевых
 #видимо что то не так
 
-k=4
-
+k=15
 
 for index in range(1,11):
+
+    cv_res = \
+        {
+        "positive_positive": 0,
+        "positive_negative": 0,
+        "negative_positive": 0,
+        "negative_negative": 0,
+        "contradictory": 0,
+        "not_classified": 0
+        }
+
+
     q=open("data/train"+str(index)+".csv","r")
     train = [ a.strip().split(",") for a in q]
     plus = [a for a in train if a[-1]=="positive"]
@@ -170,9 +163,11 @@ for index in range(1,11):
 
     w.close()
     unknown.pop(0)
-    results.append(classification(plus, minus, unknown,k))
+    results.append(classification(plus, minus, unknown,k,cv_res))
 
 stats = statistics(results)
 
+
+pprint.pprint(results)
 pprint.pprint(stats)
 
