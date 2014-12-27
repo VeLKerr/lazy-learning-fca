@@ -1,18 +1,20 @@
-import pprint
+#import pprint
 import sys
+from functools import reduce
 
-index = sys.argv[1]
+#index = sys.argv[1]
+index = '0'
 
-q=open("train"+index+".csv","r")
-train = [ a.strip().split(",") for a in q]
-plus = [a for a in train if a[-1]=="positive"]
-minus = [a for a in train if a[-1]=="negative"]
+with open("train"+index+".csv", "r") as q:
+    ql = q.readlines()
+    train = [a.strip().split(",") for a in ql[1:len(ql)]]
+    plus = [a for a in train if a[-1] == "positive"]
+    minus = [a for a in train if a[-1] == "negative"]
 
-#print t
-q.close()
-w=open("test"+index+".csv","r")
-unknown = [a.strip().split(",") for a in w]
-w.close()
+with open("test"+index+".csv", "r") as w:
+    wl = w.readlines()
+    unknown = [a.strip().split(",") for a in wl[1:len(wl)]]
+#print(unknown)
 
 
 cv_res = {
@@ -27,7 +29,7 @@ cv_res = {
 attrib_names = [
 'top-left-square',
 'top-middle-square',
-' top-right-square',
+'top-right-square',
 'middle-left-square',
 'middle-middle-square',
 'middle-right-square',
@@ -41,28 +43,41 @@ attrib_names = [
 def make_intent(example):
     global attrib_names
     return set([i+':'+str(k) for i,k in zip(attrib_names,example)])
-    
+
+
 def check_hypothesis(context_plus, context_minus, example):
-  #  print example
+
     eintent = make_intent(example)
-  #  print eintent
     eintent.discard('class:positive')
     eintent.discard('class:negative')
+
     labels = {}
     global cv_res
+
     for e in context_plus:
-        ei = make_intent(e)
-        candidate_intent = ei & eintent
-        closure = [ make_intent(i) for i in context_minus if make_intent(i).issuperset(candidate_intent)]
-        closure_size = len([i for i in closure if len(i)])
-    #    print closure
+        # Пересечение описания объекта с плюс-контекстом
+        candidate_intent = make_intent(e) & eintent
+
+        # Мощность пересечения
+        intent_power = len(candidate_intent)/len(eintent)
+
+        # Фальсифицируемость - объекты минус-контекста, подходящие под описание текущей гипотезы
+        closure = [make_intent(obj) for obj in context_minus if make_intent(obj).issuperset(candidate_intent)]
+        closure_size = len(closure)
+        falsif = closure_size/len(context_minus)
+
+
+        #closure_size = len([i for i in closure if len(i)])
+        #print(e, closure_size, len(closure))
+        #print(closure)
         #print closure_size * 1.0 / len(context_minus)
-        res = reduce(lambda x,y: x&y if x&y else x|y, closure ,set())
-        for cs in ['positive','negative']:
+
+        res = reduce(lambda x, y: x & y if x & y else x | y, closure, set())
+        for cs in ['positive', 'negative']:
             if 'class:'+cs in res:
                 labels[cs] = True
                 labels[cs+'_res'] = candidate_intent
-                labels[cs+'_total_weight'] = labels.get(cs+'_total_weight',0) +closure_size * 1.0 / len(context_minus) / len(context_plus)
+                labels[cs+'_total_weight'] = labels.get(cs+'_total_weight', 0) +closure_size * 1.0 / len(context_minus) / len(context_plus)
     for e in context_minus:
         ei = make_intent(e)
         candidate_intent = ei & eintent
@@ -70,13 +85,13 @@ def check_hypothesis(context_plus, context_minus, example):
         closure_size = len([i for i in closure if len(i)])
         #print closure_size * 1.0 / len(context_plus)
         res = reduce(lambda x,y: x&y if x&y else x|y, closure, set())
-        for cs in ['positive','negative']:
+        for cs in ['positive', 'negative']:
             if 'class:'+cs in res:
                 labels[cs] = True
                 labels[cs+'_res'] = candidate_intent
                 labels[cs+'_total_weight'] = labels.get(cs+'_total_weight',0) +closure_size * 1.0 / len(context_plus) / len(context_minus)
-    print eintent
-    print labels
+    #print(eintent)
+    #print(labels)
     if labels.get("positive",False) and labels.get("negative",False):
        cv_res["contradictory"] += 1
        return
@@ -94,8 +109,8 @@ def check_hypothesis(context_plus, context_minus, example):
 i = 0
 for elem in unknown:
     #print elem
-    print "done"
+    print(i, "done")
     i += 1
     check_hypothesis(plus, minus, elem)
 #    if i == 3: break
-print cv_res
+print(cv_res)
