@@ -85,7 +85,7 @@ for file in range(1,11):
     tn=tn+TN
     fp=fp+FP
     fn=fn+FN
-    cont=cont+cv_res["contradictory"]
+    cont=cv_res["contradictory"]
     sensitivity+=(TP/(TP+FN))/10
     specificity+=(TN/(FP+TN))/10
     precision+=(TP/(TP+FP))/10
