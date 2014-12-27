@@ -1,5 +1,3 @@
-
-
 cv_res = {
  "positive_positive": 0,
  "positive_negative": 0,
@@ -29,37 +27,27 @@ def check_hypothesis(context_plus, context_minus, example):
     eintent = make_intent(example)
     eintent.discard('class:positive')
     eintent.discard('class:negative')
-    positive=0
-    negative=0
+    posmax=0
+    negmax=0
     global cv_res
     for e in context_plus:
         ei = make_intent(e)
-        inter=ei&eintent
-        x=0
-        for int in inter:
-            if int[-1]=='x':
-                x=x+1
-        if x>=3:
-            positive=positive+1
+        if len(ei&eintent)>posmax:
+            posmax=len(ei&eintent)
     for e in context_minus:
         ei = make_intent(e)
-        inter=ei&eintent
-        o=0
-        for int in inter:
-            if int[-1]=='o':
-                o=o+1
-        if o>=3:
-            negative=negative+1
-    if positive==negative:
+        if len(ei&eintent)>negmax:
+            negmax=len(ei&eintent)
+    if posmax==negmax:
        cv_res["contradictory"] += 1
        return
-    if example[-1] == "positive" and positive>negative:
+    if example[-1] == "positive" and posmax>negmax:
        cv_res["positive_positive"] += 1
-    if example[-1] == "negative" and positive>negative:
+    if example[-1] == "negative" and posmax>negmax:
        cv_res["negative_positive"] += 1
-    if example[-1] == "positive" and positive<negative:
+    if example[-1] == "positive" and posmax<negmax:
        cv_res["positive_negative"] += 1
-    if example[-1] == "negative" and positive<negative:
+    if example[-1] == "negative" and posmax<negmax:
        cv_res["negative_negative"] += 1
 
 sensitivity=0
@@ -123,4 +111,3 @@ print("FPR="+str(FPR))
 print("FDR="+str(FDR))
 print("FNR="+str(FNR))
 print("accuracy="+str(accuracy))
-

@@ -58,6 +58,11 @@ FPR=0
 FDR=0
 FNR=0
 accuracy=0
+tp=0
+tn=0
+fp=0
+fn=0
+cont=0
 
 for file in range(1,11):
     q=open("train"+str(file)+".csv","r")
@@ -76,6 +81,11 @@ for file in range(1,11):
     TN=cv_res["negative_negative"]
     FP=cv_res["negative_positive"]
     FN=cv_res["positive_negative"]
+    tp=tp+TP
+    tn=tn+TN
+    fp=fp+FP
+    fn=fn+FN
+    cont=cont+cv_res["contradictory"]
     sensitivity+=(TP/(TP+FN))/10
     specificity+=(TN/(FP+TN))/10
     precision+=(TP/(TP+FP))/10
@@ -88,6 +98,11 @@ for file in range(1,11):
     cv_res["negative_negative"]=0
     cv_res["negative_positive"]=0
     cv_res["positive_negative"]=0
+print("true positive total:"+str(tp))
+print("true negative total:"+str(tn))
+print("false positive total:"+str(fp))
+print("false negative total:"+str(fn))
+print("contradictory total:"+str(cont))
 print("sensitivity="+str(sensitivity))
 print("specificity="+str(specificity))
 print("precision="+str(precision))

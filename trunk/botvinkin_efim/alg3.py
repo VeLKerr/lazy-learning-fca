@@ -29,27 +29,17 @@ def check_hypothesis(context_plus, context_minus, example):
     eintent.discard('class:negative')
     positive=0
     negative=0
-    blanc=0
-    for cell in eintent:
-        if cell[-1]=='b':
-            blanc=blanc+1
     global cv_res
     for e in context_plus:
         ei = make_intent(e)
-        ext=0
-        for cell in ei:
-            if cell[-1]=='b':
-                ext=ext+1
-        if blanc==ext:
+        if len(ei&eintent)>(2*len(eintent)/3):
             positive=positive+1
     for e in context_minus:
         ei = make_intent(e)
-        ext=0
-        for cell in ei:
-            if cell[-1]=='b':
-                ext=ext+1
-        if blanc==ext:
+        if len(ei&eintent)>(2*len(eintent)/3):
             negative=negative+1
+    positive=positive/len(context_plus)
+    negative=negative/len(context_minus)
     if positive==negative:
        cv_res["contradictory"] += 1
        return
