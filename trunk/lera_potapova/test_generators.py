@@ -28,7 +28,7 @@ cv_res = {
 attrib_names = [
 'top-left-square',
 'top-middle-square',
-' top-right-square',
+'top-right-square',
 'middle-left-square',
 'middle-middle-square',
 'middle-right-square',
@@ -56,7 +56,7 @@ def check_hypothesis(context_plus, context_minus, example):
         candidate_intent = ei & eintent
         closure = [ make_intent(i) for i in context_minus if make_intent(i).issuperset(candidate_intent)]
         closure_size = len([i for i in closure if len(i)])
-    #    print closure
+        #print closure
         #print closure_size * 1.0 / len(context_minus)
         res = functools.reduce(lambda x,y: x&y if x&y else x|y, closure ,set())
         for cs in ['positive','negative']:
