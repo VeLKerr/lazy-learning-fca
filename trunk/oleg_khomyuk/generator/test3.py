@@ -1,20 +1,5 @@
 __author__ = 'olegkhomyuk'
 
-def kfoldcv(k):
-    import random
-    with open('data.csv', 'r') as data:
-        lines = data.readlines()
-
-        entities = [a.strip().split(",") for a in lines]
-        random.shuffle(entities)
-        n = len(entities)
-
-        dataset = []
-
-        #for
-
-    return
-
 
 def importdata(index):
     with open("train" + index + ".csv", "r") as q:
@@ -134,7 +119,7 @@ def classify(context_plus, context_minus, example):
     return ans, plus_rate, minus_rate
 
 
-for exp in range(10, 11):
+for exp in range(1, 11):
     (dplus, dminus, dunknown) = importdata(str(exp))
     i = 0
     for elem in dunknown:

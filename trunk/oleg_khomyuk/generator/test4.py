@@ -1,22 +1,6 @@
 __author__ = 'olegkhomyuk'
 
 
-def kfoldcv(k):
-    import random
-    with open('data.csv', 'r') as data:
-        lines = data.readlines()
-
-        entities = [a.strip().split(",") for a in lines]
-        random.shuffle(entities)
-        n = len(entities)
-
-        dataset = []
-
-        #for
-
-    return
-
-
 def importdata(index):
     with open("train" + index + ".csv", "r") as q:
         ql = q.readlines()
