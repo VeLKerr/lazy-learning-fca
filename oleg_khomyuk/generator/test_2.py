@@ -29,11 +29,6 @@ attrib_names = [
 ]
 
 
-# Algorithm 1.
-# For each sample, find its intersection with positive/negative contexts;
-# vote +1 for the positive/negative class, if the hypothesis is not falsifiable.
-
-
 def make_intent(example):
     return set((i + ':' + k) for i, k in zip(attrib_names, example))
 
