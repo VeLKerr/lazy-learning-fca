@@ -1,6 +1,5 @@
 __author__ = 'olegkhomyuk'
 
-
 def kfoldcv(k):
     import random
     with open('data.csv', 'r') as data:
@@ -32,11 +31,11 @@ def importdata(index):
 
 
 cv_res = {
-    "positive_positive": 0,
-    "positive_negative": 0,
-    "negative_positive": 0,
-    "negative_negative": 0,
-    "contradictory": 0,
+    "TP": 0,
+    "FN": 0,
+    "FP": 0,
+    "TN": 0,
+    "?": 0,
 }
 
 attrib_names = [
@@ -58,13 +57,10 @@ def make_intent(example):
     return set([i + ':' + str(k) for i, k in zip(attrib_names, example)])
 
 
-def check_hypothesis(context_plus, context_minus, example):
+def classify(context_plus, context_minus, example):
     eintent = make_intent(example)
     eintent.discard('class:positive')
     eintent.discard('class:negative')
-
-    labels = {}
-    global cv_res
 
     plus_rate = 0
 
@@ -85,22 +81,7 @@ def check_hypothesis(context_plus, context_minus, example):
         closure_minus_size = len(closure_minus)
         falsif = closure_minus_size * 1.0 / len(context_minus)
 
-        plus_rate += (support > falsif) * (support - falsif) * 100.0 / (len(context_plus))
-
-        #closure_size = len([i for i in closure if len(i)])
-        #print(e, closure_size, len(closure))
-        #print(closure)
-        #print closure_size * 1.0 / len(context_minus)
-
-        #res = reduce(lambda x, y: x & y if x & y else x | y, closure_plus, set())
-        #for cs in ['positive', 'negative']:
-        #    if 'class:' + cs in res:
-        #        labels[cs] = True
-        #        labels[cs + '_res'] = candidate_intent
-        #        labels[cs + '_total_weight'] = labels.get(cs + '_total_weight', 0) + closure_plus_size * 1.0 / len(
-        #            context_minus) / len(context_plus)
-
-    #print(plus_rate)
+        plus_rate += (intent_power > 0.6) * (support > falsif) * (support - falsif) * 100.0 / (len(context_plus))
 
     minus_rate = 0
 
@@ -121,23 +102,7 @@ def check_hypothesis(context_plus, context_minus, example):
         closure_plus_size = len(closure_plus)
         falsif = closure_plus_size * 1.0 / len(context_plus)
 
-        minus_rate += (support > falsif) * (support - falsif) * 100.0 / len(context_minus)
-
-
-        #closure = [make_intent(i) for i in context_minus if make_intent(i).issuperset(candidate_intent)]
-        #closure_size = len([i for i in closure if len(i)])
-        #print closure_size * 1.0 / len(context_plus)
-        #res = reduce(lambda x, y: x & y if x & y else x | y, closure_minus, set())
-        #for cs in ['positive', 'negative']:
-        #    if 'class:' + cs in res:
-        #        labels[cs] = True
-        #        labels[cs + '_res'] = candidate_intent
-        #        labels[cs + '_total_weight'] = labels.get(cs + '_total_weight', 0) + closure_minus_size * 1.0 / len(
-        #            context_plus) / len(context_minus)
-    #print(eintent)
-    #print(labels)
-
-    #print(minus_rate)
+        minus_rate += (intent_power > 0.6) * (support > falsif) * (support - falsif) * 100.0 / len(context_minus)
 
     if plus_rate + minus_rate:
         p = (plus_rate - minus_rate)/(plus_rate + minus_rate)
@@ -151,49 +116,30 @@ def check_hypothesis(context_plus, context_minus, example):
     else:
         ans = '?'
 
+    global cv_res
+
     if ans == '?':
-        cv_res['contradictory'] += 1
+        cv_res['?'] += 1
     if ans == 'positive':
         if example[-1] == 'positive':
-            cv_res['positive_positive'] += 1
+            cv_res['TP'] += 1
         elif example[-1] == 'negative':
-            cv_res['negative_positive'] += 1
+            cv_res['FP'] += 1
     elif ans == 'negative':
         if example[-1] == 'negative':
-            cv_res['negative_negative'] += 1
+            cv_res['TN'] += 1
         elif example[-1] == 'positive':
-            cv_res['positive_negative'] += 1
-
-
-
-    #if labels.get("positive",False) and labels.get("negative",False):
-    #   cv_res["contradictory"] += 1
-    #   return
-    #if example[-1] == "positive" and labels.get("positive",False):
-    #   cv_res["positive_positive"] += 1
-    #if example[-1] == "negative" and labels.get("positive",False):
-    #   cv_res["negative_positive"] += 1
-    #if example[-1] == "positive" and labels.get("negative",False):
-    #   cv_res["positive_negative"] += 1
-    #if example[-1] == "negative" and labels.get("negative",False):
-    #   cv_res["negative_negative"] += 1
+            cv_res['FN'] += 1
 
     return ans, plus_rate, minus_rate
 
-#sanity check:
-#check_hypothesis(plus_examples, minus_examples, plus_examples[3])
 
-for exp in range(1, 11):
+for exp in range(10, 11):
     (dplus, dminus, dunknown) = importdata(str(exp))
     i = 0
     for elem in dunknown:
-    #print elem
-
         i += 1
-        ans = check_hypothesis(dplus, dminus, elem)
+        ans = classify(dplus, dminus, elem)
         print(exp, i, elem[-1], ans)
-        #print(i, elem[-1], ans)
-        #print(ans[0])
-        #    if i == 3: break
 
     print(cv_res)
